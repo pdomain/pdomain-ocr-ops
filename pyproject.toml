@@ -37,6 +37,7 @@ packages = ["pd_ocr_ops"]
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.39.4",
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
     "pytest-xdist>=3.8.0",
@@ -50,6 +51,19 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
+
+[tool.basedpyright]
+include = ["pd_ocr_ops", "tests", "scripts"]
+exclude = ["**/__pycache__", "**/.venv", "**/node_modules"]
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "tests"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "scripts"
 
 [tool.pytest.ini_options]
 addopts = "-ra"

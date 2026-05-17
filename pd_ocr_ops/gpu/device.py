@@ -12,7 +12,7 @@ _VALID_DEVICES = frozenset({"local", "mps", "cpu"})
 def _cuda_available() -> bool:
     """Return True if a CUDA-capable GPU is accessible."""
     try:
-        import cupy  # type: ignore[import]
+        import cupy  # pyright: ignore[reportMissingImports]  # optional GPU dep; installed via [gpu] extra
 
         return cupy.cuda.runtime.getDeviceCount() > 0
     except Exception:
@@ -22,7 +22,7 @@ def _cuda_available() -> bool:
 def _mps_available() -> bool:
     """Return True if Apple MPS (Metal Performance Shaders) is available."""
     try:
-        import torch  # type: ignore[import]
+        import torch  # pyright: ignore[reportMissingImports]  # optional GPU dep; installed via [gpu] extra
 
         return torch.backends.mps.is_available()
     except Exception:
@@ -45,7 +45,7 @@ def pick_device() -> Literal["local", "mps", "cpu"]:
                 f"PD_GPU_BACKEND={explicit!r} is not a valid device. "
                 f"Allowed: {sorted(_VALID_DEVICES)}"
             )
-        return explicit  # type: ignore[return-value]
+        return explicit  # pyright: ignore[reportReturnType]  # narrowed by _VALID_DEVICES check above
 
     # Check deprecated alias
     legacy = os.environ.get("PGDP_GPU_BACKEND")
@@ -60,7 +60,7 @@ def pick_device() -> Literal["local", "mps", "cpu"]:
                 f"PGDP_GPU_BACKEND={legacy!r} is not a valid device. "
                 f"Allowed: {sorted(_VALID_DEVICES)}"
             )
-        return legacy  # type: ignore[return-value]
+        return legacy  # pyright: ignore[reportReturnType]  # narrowed by _VALID_DEVICES check above
 
     # Auto-detect
     if _cuda_available():

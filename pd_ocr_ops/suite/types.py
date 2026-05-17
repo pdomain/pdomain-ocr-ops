@@ -36,7 +36,7 @@ class InstalledApp(BaseModel):
     icon: str
     display_name: str
     enabled: bool = True
-    registered_at: datetime = None  # type: ignore[assignment]
+    registered_at: datetime = None  # pyright: ignore[reportAssignmentType]  # Pydantic deferred default via model_post_init
 
     def model_post_init(self, __context: Any) -> None:
         if self.registered_at is None:
@@ -84,7 +84,7 @@ class CommonUIPrefs(BaseModel):
     density: str = "normal"
     accent: str = "#d6925a"
     font_size_base: int = 12
-    layer_colors: LayerColors = None  # type: ignore[assignment]
+    layer_colors: LayerColors = None  # pyright: ignore[reportAssignmentType]  # Pydantic deferred default via model_post_init
 
     def model_post_init(self, __context: Any) -> None:
         if self.layer_colors is None:
@@ -124,7 +124,7 @@ class UIPrefs(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    common: CommonUIPrefs = None  # type: ignore[assignment]
+    common: CommonUIPrefs = None  # pyright: ignore[reportAssignmentType]  # Pydantic deferred default via model_post_init
     apps: dict[str, dict[str, Any]] = {}
 
     def model_post_init(self, __context: Any) -> None:

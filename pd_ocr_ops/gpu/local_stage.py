@@ -73,7 +73,7 @@ class LocalStageDispatcher:
         return StageResult(
             stage_id=stage_id,
             page_id=page_id,
-            device=device,  # type: ignore[arg-type]
+            device=device,  # pyright: ignore[reportArgumentType]  # narrowed by _VALID_DEVICES + fallback logic above
             duration_ms=duration_ms,
             metadata=result_dict or {},
         )
