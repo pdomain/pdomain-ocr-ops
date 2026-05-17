@@ -2,17 +2,40 @@
 
 from __future__ import annotations
 
+import time
+
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
 
-from pd_ocr_ops.suite.types import CommonUIPrefs, SuiteAdapters
+from pd_ocr_ops.suite.types import CommonUIPrefs, InstalledApp, SuiteAdapters
 
 _ALLOWED_ICON_SIZES = {1024, 512, 256, 128, 64, 32, 16}
 
 
-def mount_routes(app: FastAPI, adapters: SuiteAdapters | None = None) -> None:
-    """Mount suite routes under /api/suite/* onto a FastAPI app."""
+def mount_routes(
+    app: FastAPI,
+    adapters: SuiteAdapters | None = None,
+    *,
+    suite_app: InstalledApp | None = None,
+) -> None:
+    """Mount suite routes under /api/suite/* and /healthz onto a FastAPI app.
+
+    Parameters
+    ----------
+    app:
+        The FastAPI application to mount routes onto.
+    adapters:
+        Suite adapter bundle.  Defaults to ``SuiteAdapters.local()``.
+    suite_app:
+        The ``InstalledApp`` representing this process.  Stored on
+        ``app.state.suite_app`` and served from ``GET /healthz``.
+        When ``None``, ``/healthz`` returns ``"unknown"`` placeholders.
+    """
     if adapters is None:
         adapters = SuiteAdapters.local()
+
+    # Record the process start time and the suite_app metadata for /healthz.
+    _start_time = time.monotonic()
+    app.state.suite_app = suite_app
 
     router = APIRouter(prefix="/api/suite", tags=["suite"])
 
@@ -73,3 +96,15 @@ def mount_routes(app: FastAPI, adapters: SuiteAdapters | None = None) -> None:
         return Response(content=icon_path.read_bytes(), media_type="image/png")
 
     app.include_router(icons_router)
+
+    # Centralized health endpoint — mounted at /healthz (not under /api/suite/).
+    # No auth required; LocalSpawnLauncher polls this to detect readiness.
+    @app.get("/healthz", tags=["health"])
+    async def healthz() -> dict[str, object]:
+        current: InstalledApp | None = app.state.suite_app
+        return {
+            "status": "ok",
+            "app_id": current.app_id if current is not None else "unknown",
+            "version": current.version if current is not None else "unknown",
+            "uptime_s": time.monotonic() - _start_time,
+        }
