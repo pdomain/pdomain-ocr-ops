@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime  # noqa: TC003  # Pydantic requires runtime import
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -37,6 +37,7 @@ class JobStatus(BaseModel):
     @field_validator("progress")
     @classmethod
     def validate_progress(cls, v: float) -> float:
+        """Validate that progress is in [0.0, 1.0]."""
         if not (0.0 <= v <= 1.0):
             raise ValueError(f"progress must be between 0.0 and 1.0, got: {v}")
         return v

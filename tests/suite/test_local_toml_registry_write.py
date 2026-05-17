@@ -1,5 +1,5 @@
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import filelock
@@ -7,7 +7,7 @@ import filelock
 from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
 from pd_ocr_ops.suite.types import InstalledApp
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _make_app(app_id: str, version: str = "1.0.0") -> InstalledApp:

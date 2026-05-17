@@ -1,13 +1,17 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
 
-from pd_ocr_ops.suite.sibling_spawn import LaunchResultOpened, LaunchTimeout, LocalSpawnLauncher
+from pd_ocr_ops.suite.sibling_spawn import (
+    LaunchResultOpened,
+    LaunchTimeoutError,
+    LocalSpawnLauncher,
+)
 from pd_ocr_ops.suite.types import InstalledApp
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _make_installed(port: int = 8001) -> InstalledApp:
@@ -102,7 +106,7 @@ async def test_launch_times_out():
         patch("subprocess.Popen", return_value=mock_proc),
         patch("asyncio.sleep", new_callable=AsyncMock),
     ):
-        with pytest.raises(LaunchTimeout):
+        with pytest.raises(LaunchTimeoutError):
             await launcher.launch(app)
 
         # Process should NOT be terminated on timeout

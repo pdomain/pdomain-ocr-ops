@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from typing import AsyncIterator, runtime_checkable
+from typing import TYPE_CHECKING, runtime_checkable
 
 from typing_extensions import Protocol
 
-from pd_ocr_ops.gpu.types import JobEvent, JobStatus, StageResult
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from pd_ocr_ops.gpu.types import JobEvent, JobStatus, StageResult
 
 
 @runtime_checkable
@@ -16,7 +19,9 @@ class StageDispatcher(Protocol):
     Mirrors pgdp-prep's existing STAGE_IMPL registry shape.
     """
 
-    async def run_stage(self, stage_id: str, page_id: str, **kwargs) -> StageResult: ...
+    async def run_stage(self, stage_id: str, page_id: str, **kwargs: object) -> StageResult:
+        """Dispatch a short GPU stage call and return the result."""
+        ...
 
 
 @runtime_checkable

@@ -3,7 +3,7 @@
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -12,7 +12,7 @@ from pd_ocr_ops import mount_routes
 from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
 from pd_ocr_ops.suite.types import InstalledApp
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def test_e2e_mount_routes_real_fastapi_app(tmp_path, monkeypatch):

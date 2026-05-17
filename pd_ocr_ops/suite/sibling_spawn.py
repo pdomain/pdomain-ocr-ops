@@ -7,19 +7,21 @@ import os
 import subprocess
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, runtime_checkable
+from typing import TYPE_CHECKING, Annotated, Literal, runtime_checkable
 
 import httpx
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated, Protocol
+from typing_extensions import Protocol
 
 if TYPE_CHECKING:
-    pass
+    from pd_ocr_ops.suite.types import InstalledApp
 
-from pd_ocr_ops.suite.types import InstalledApp
+    pass
 
 
 class LaunchResultOpened(BaseModel):
+    """Sibling launched (or already running); url is ready to use."""
+
     kind: Literal["opened"] = "opened"
     url: str
     spawned: bool
@@ -27,6 +29,8 @@ class LaunchResultOpened(BaseModel):
 
 
 class LaunchResultRequiresHostConfig(BaseModel):
+    """Hosted-mode launch requires user to configure a remote host first."""
+
     kind: Literal["requires-host-config"] = "requires-host-config"
     sibling_id: str
 
@@ -37,7 +41,7 @@ LaunchResult = Annotated[
 ]
 
 
-class LaunchTimeout(TimeoutError):
+class LaunchTimeoutError(TimeoutError):
     """Raised when a spawned app doesn't become healthy within timeout_s."""
 
 
@@ -45,7 +49,9 @@ class LaunchTimeout(TimeoutError):
 class SiblingLaunchAdapter(Protocol):
     """Protocol for sibling app launcher implementations."""
 
-    async def launch(self, app: InstalledApp) -> LaunchResult: ...
+    async def launch(self, app: InstalledApp) -> LaunchResult:
+        """Spawn the sibling app if not running; return its URL."""
+        ...
 
 
 # Allowlist of env vars forwarded to spawned siblings
@@ -61,11 +67,11 @@ class LocalSpawnLauncher:
 
     def _build_env(self) -> dict[str, str]:
         """Build allowlist-filtered env dict for spawned process."""
-        env: dict[str, str] = {}
-        for key, val in os.environ.items():
-            if any(key == prefix or key.startswith(prefix) for prefix in _ENV_ALLOWLIST_PREFIXES):
-                env[key] = val
-        return env
+        return {
+            key: val
+            for key, val in os.environ.items()
+            if any(key == prefix or key.startswith(prefix) for prefix in _ENV_ALLOWLIST_PREFIXES)
+        }
 
     async def launch(self, app: InstalledApp) -> LaunchResult:
         """Spawn sibling if not already running, poll until healthy."""
@@ -100,7 +106,7 @@ class LocalSpawnLauncher:
 
         # Timed out — do NOT terminate (user may still want to inspect)
         # See docstring: subprocess termination on timeout is a Phase 4 concern.
-        raise LaunchTimeout(
+        raise LaunchTimeoutError(
             f"App {app.app_id!r} did not become healthy within {self._timeout_s}s "
             f"(binary: {app.binary}, port: {app.default_port})"
         )

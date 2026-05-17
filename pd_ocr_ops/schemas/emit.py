@@ -57,7 +57,7 @@ def emit_schemas() -> dict:
 def main() -> None:
     """CLI entry point: emit JSON Schema to stdout."""
     schemas = emit_schemas()
-    print(json.dumps(schemas, indent=2))
+    print(json.dumps(schemas, indent=2))  # noqa: T201  # CLI output is intentional
 
 
 if __name__ == "__main__":

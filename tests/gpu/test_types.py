@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pd_ocr_ops.gpu.types import JobEvent, JobSpec, JobStatus, StageResult
 
@@ -35,7 +35,7 @@ def test_job_status_shape():
 
 
 def test_job_event_shape():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     event = JobEvent(
         job_id="job-abc",
         seq=1,

@@ -4,7 +4,7 @@ from pd_ocr_ops.gpu.device import pick_device
 from pd_ocr_ops.gpu.protocols import LongJobRunner, StageDispatcher
 
 __all__ = [
-    "StageDispatcher",
     "LongJobRunner",
+    "StageDispatcher",
     "pick_device",
 ]

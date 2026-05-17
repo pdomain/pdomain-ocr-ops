@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -7,16 +7,16 @@ from pd_ocr_ops.suite.types import InstalledApp
 
 
 def _make_app(**kwargs):
-    defaults = dict(
-        app_id="pd-ocr-labeler-spa",
-        package="pd_ocr_labeler_spa",
-        version="0.4.2",
-        binary="/usr/local/bin/pd-ocr-labeler",
-        default_port=8001,
-        icon="labeler",
-        display_name="OCR Labeler",
-        registered_at=datetime.now(timezone.utc),
-    )
+    defaults = {
+        "app_id": "pd-ocr-labeler-spa",
+        "package": "pd_ocr_labeler_spa",
+        "version": "0.4.2",
+        "binary": "/usr/local/bin/pd-ocr-labeler",
+        "default_port": 8001,
+        "icon": "labeler",
+        "display_name": "OCR Labeler",
+        "registered_at": datetime.now(UTC),
+    }
     defaults.update(kwargs)
     return InstalledApp(**defaults)
 

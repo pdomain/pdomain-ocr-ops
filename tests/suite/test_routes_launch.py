@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -7,7 +7,7 @@ from pd_ocr_ops.suite.routes import mount_routes
 from pd_ocr_ops.suite.sibling_spawn import LaunchResultOpened
 from pd_ocr_ops.suite.types import InstalledApp, SuiteAdapters
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _make_installed(app_id: str, enabled: bool = True) -> InstalledApp:

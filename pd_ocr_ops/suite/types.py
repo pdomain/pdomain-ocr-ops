@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -39,12 +39,14 @@ class InstalledApp(BaseModel):
     registered_at: datetime = None  # pyright: ignore[reportAssignmentType]  # Pydantic deferred default via model_post_init
 
     def model_post_init(self, __context: Any) -> None:
+        """Set registered_at to now if not provided at construction time."""
         if self.registered_at is None:
-            object.__setattr__(self, "registered_at", datetime.now(timezone.utc))
+            object.__setattr__(self, "registered_at", datetime.now(UTC))
 
     @field_validator("binary")
     @classmethod
     def binary_must_be_absolute(cls, v: str) -> str:
+        """Validate that binary path is absolute."""
         if not v.startswith("/"):
             raise ValueError(f"binary path must be absolute, got: {v!r}")
         return v
@@ -72,6 +74,7 @@ class LayerColors(BaseModel):
     @field_validator("word", "line", "para", "block")
     @classmethod
     def validate_hex(cls, v: str) -> str:
+        """Validate each color value is a #RRGGBB hex string."""
         return _validate_hex(v)
 
 
@@ -87,12 +90,14 @@ class CommonUIPrefs(BaseModel):
     layer_colors: LayerColors = None  # pyright: ignore[reportAssignmentType]  # Pydantic deferred default via model_post_init
 
     def model_post_init(self, __context: Any) -> None:
+        """Set layer_colors to defaults if not provided at construction time."""
         if self.layer_colors is None:
             object.__setattr__(self, "layer_colors", LayerColors())
 
     @field_validator("theme")
     @classmethod
     def validate_theme(cls, v: str) -> str:
+        """Validate theme is one of the allowed values."""
         allowed = {"light", "dark"}
         if v not in allowed:
             raise ValueError(f"theme must be one of {allowed}, got: {v!r}")
@@ -101,6 +106,7 @@ class CommonUIPrefs(BaseModel):
     @field_validator("density")
     @classmethod
     def validate_density(cls, v: str) -> str:
+        """Validate density is one of the allowed values."""
         allowed = {"compact", "normal", "comfortable"}
         if v not in allowed:
             raise ValueError(f"density must be one of {allowed}, got: {v!r}")
@@ -109,11 +115,13 @@ class CommonUIPrefs(BaseModel):
     @field_validator("accent")
     @classmethod
     def validate_accent(cls, v: str) -> str:
+        """Validate accent is a #RRGGBB hex color."""
         return _validate_hex(v)
 
     @field_validator("font_size_base")
     @classmethod
     def validate_font_size(cls, v: int) -> int:
+        """Validate font_size_base is in the allowed range [8, 24]."""
         if not (8 <= v <= 24):
             raise ValueError(f"font_size_base must be between 8 and 24, got: {v}")
         return v
@@ -128,6 +136,7 @@ class UIPrefs(BaseModel):
     apps: dict[str, dict[str, Any]] = {}
 
     def model_post_init(self, __context: Any) -> None:
+        """Set common to defaults if not provided at construction time."""
         if self.common is None:
             object.__setattr__(self, "common", CommonUIPrefs())
 
@@ -148,7 +157,7 @@ class SuiteAdapters(BaseModel):
     storage: Any = None
 
     @classmethod
-    def local(cls) -> "SuiteAdapters":
+    def local(cls) -> SuiteAdapters:
         """Return a fully-wired bundle of local-mode adapters."""
         from pd_ocr_ops.suite import paths
         from pd_ocr_ops.suite.auth import NoAuthAdapter
@@ -166,7 +175,11 @@ class SuiteAdapters(BaseModel):
         )
 
     @classmethod
-    def from_env(cls) -> "SuiteAdapters":
+    def from_env(cls) -> SuiteAdapters:
+        """Return hosted-mode adapters configured from environment variables.
+
+        Not yet implemented — see Phase 4 roadmap.
+        """
         raise NotImplementedError(
             "hosted-mode adapters land in Phase 4; from_env() is not yet implemented"
         )

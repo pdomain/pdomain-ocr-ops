@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -7,7 +7,7 @@ import pytest
 from pd_ocr_ops.suite.desktop import install_shortcut, remove_shortcut
 from pd_ocr_ops.suite.types import InstalledApp
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _make_installed() -> InstalledApp:
@@ -38,9 +38,8 @@ def test_install_shortcut_raises_not_implemented_on_platform(platform):
 
 @pytest.mark.parametrize("platform", ["linux", "darwin", "win32"])
 def test_remove_shortcut_raises_not_implemented_on_each_platform(platform):
-    with patch.object(sys, "platform", platform):
-        with pytest.raises(NotImplementedError):
-            remove_shortcut("pd-app-a")
+    with patch.object(sys, "platform", platform), pytest.raises(NotImplementedError):
+        remove_shortcut("pd-app-a")
 
 
 def test_install_shortcut_signature_accepts_installed_app():
@@ -49,7 +48,6 @@ def test_install_shortcut_signature_accepts_installed_app():
 
 
 def test_install_shortcut_unknown_platform_raises_generic():
-    with patch.object(sys, "platform", "aix"):
-        with pytest.raises(NotImplementedError) as exc_info:
-            install_shortcut(_make_installed())
+    with patch.object(sys, "platform", "aix"), pytest.raises(NotImplementedError) as exc_info:
+        install_shortcut(_make_installed())
     assert "unsupported platform" in str(exc_info.value)

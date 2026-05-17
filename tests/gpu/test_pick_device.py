@@ -1,4 +1,3 @@
-
 import pytest
 
 from pd_ocr_ops.gpu.device import pick_device

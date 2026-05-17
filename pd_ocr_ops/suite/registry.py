@@ -3,15 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, runtime_checkable
+from typing import runtime_checkable
 
 import filelock
 import tomli
 import tomli_w
 from typing_extensions import Protocol
-
-if TYPE_CHECKING:
-    pass
 
 from pd_ocr_ops.suite.types import InstalledApp
 
@@ -20,11 +17,17 @@ from pd_ocr_ops.suite.types import InstalledApp
 class SuiteRegistryAdapter(Protocol):
     """Protocol for suite app registry implementations."""
 
-    def list_installed(self) -> list[InstalledApp]: ...
+    def list_installed(self) -> list[InstalledApp]:
+        """Return all currently installed apps."""
+        ...
 
-    def register(self, app: InstalledApp) -> None: ...
+    def register(self, app: InstalledApp) -> None:
+        """Register or refresh an installed app entry."""
+        ...
 
-    def unregister(self, app_id: str) -> None: ...
+    def unregister(self, app_id: str) -> None:
+        """Remove an app entry; noop if not present."""
+        ...
 
 
 class LocalTomlSuiteRegistry:
@@ -62,7 +65,7 @@ class LocalTomlSuiteRegistry:
         with filelock.FileLock(str(self._lock_path)):
             data = self._read_raw()
         apps = []
-        for app_id, app_data in data.get("apps", {}).items():
+        for app_data in data.get("apps", {}).values():
             try:
                 app = InstalledApp.model_validate(app_data)
                 # Prune stale entries: if binary doesn't exist on disk, skip

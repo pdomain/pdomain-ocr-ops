@@ -7,13 +7,16 @@ import json
 import sqlite3
 import subprocess
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import AsyncIterator
+from typing import TYPE_CHECKING
 
 import filelock
 
 from pd_ocr_ops.gpu.types import JobEvent, JobStatus
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
 _TERMINAL_STATES = frozenset({"succeeded", "failed", "cancelled"})
 
@@ -77,7 +80,7 @@ class LocalLongJobRunner:
         init_jobs_db(self._db_path)
 
     def _now_iso(self) -> str:
-        return datetime.now(timezone.utc).isoformat()
+        return datetime.now(UTC).isoformat()
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(str(self._db_path))

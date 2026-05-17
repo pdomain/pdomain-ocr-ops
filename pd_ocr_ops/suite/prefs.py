@@ -5,13 +5,10 @@ from __future__ import annotations
 import json
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, runtime_checkable
+from typing import runtime_checkable
 
 import filelock
 from typing_extensions import Protocol
-
-if TYPE_CHECKING:
-    pass
 
 from pd_ocr_ops.suite.types import CommonUIPrefs, UIPrefs
 
@@ -20,11 +17,17 @@ from pd_ocr_ops.suite.types import CommonUIPrefs, UIPrefs
 class PrefsAdapter(Protocol):
     """Protocol for suite UI preferences storage implementations."""
 
-    def read(self) -> UIPrefs: ...
+    def read(self) -> UIPrefs:
+        """Read current prefs; return defaults if not yet persisted."""
+        ...
 
-    def write_common(self, common: CommonUIPrefs) -> None: ...
+    def write_common(self, common: CommonUIPrefs) -> None:
+        """Persist the common section; preserve per-app sections."""
+        ...
 
-    def write_app(self, app_id: str, payload: dict) -> None: ...
+    def write_app(self, app_id: str, payload: dict) -> None:
+        """Persist the per-app blob for app_id; preserve other sections."""
+        ...
 
 
 class LocalFilePrefs:

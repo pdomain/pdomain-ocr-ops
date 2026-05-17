@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -6,7 +6,7 @@ import pytest
 from pd_ocr_ops.suite.sibling_spawn import LaunchResultOpened, LocalSpawnLauncher
 from pd_ocr_ops.suite.types import InstalledApp
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _make_installed(port: int = 8001) -> InstalledApp:

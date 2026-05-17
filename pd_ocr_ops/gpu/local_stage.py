@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import time
 import warnings
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from pd_ocr_ops.gpu.device import pick_device
 from pd_ocr_ops.gpu.types import StageResult
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _VALID_DEVICES = frozenset({"local", "mps", "cpu", "modal", "shared_container"})
 

@@ -10,10 +10,10 @@ from pd_ocr_ops.suite.types import (
 )
 
 __all__ = [
-    "SuiteApp",
+    "CommonUIPrefs",
     "InstalledApp",
     "LayerColors",
-    "CommonUIPrefs",
-    "UIPrefs",
     "SuiteAdapters",
+    "SuiteApp",
+    "UIPrefs",
 ]
