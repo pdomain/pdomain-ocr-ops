@@ -42,6 +42,7 @@ dev = [
     "pre-commit>=4.2.0",
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
+    "pytest-cov>=6.2.1",
     "pytest-xdist>=3.8.0",
     "ruff>=0.15.13",
     "httpx>=0.27",
@@ -186,6 +187,21 @@ root = "tests"
 root = "scripts"
 
 [tool.pytest.ini_options]
-addopts = "-ra"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=pd_ocr_ops",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html",
+]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    # ResourceWarning from subprocess.Popen stdout/stderr PIPE left open
+    # until GC in LocalLongJobRunner._supervise — pipes are read once then
+    # orphaned by design; closing in finally would race with caller reads.
+    "ignore::ResourceWarning",
+]
