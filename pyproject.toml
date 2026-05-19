@@ -38,7 +38,7 @@ Source = "https://github.com/ConcaveTrillion/pd-ocr-ops"
 packages = ["pd_ocr_ops"]
 
 [tool.uv.sources]
-pd-book-tools = { git = "https://github.com/ConcaveTrillion/pd-book-tools.git", rev = "cc783c5c8fd92773092cb5c0fe05728574ec256b" }
+pd-book-tools = { path = "../pd-book-tools", editable = true }
 
 [dependency-groups]
 dev = [
