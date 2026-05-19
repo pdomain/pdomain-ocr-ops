@@ -24,6 +24,9 @@ dependencies = [
     "uvicorn>=0.30",
 ]
 
+[project.optional-dependencies]
+modal = ["modal>=0.66"]
+
 [project.scripts]
 pd-ocr-ops-schemas = "pd_ocr_ops.schemas.emit:main"
 
