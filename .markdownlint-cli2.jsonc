@@ -11,6 +11,10 @@
     // Tables in this repo aren't always rectangular (some rows are much
     // longer than others). The "compact" / "aligned" enforcement adds a
     // lot of churn for no reader benefit.
-    "MD060": false
+    "MD060": false,
+
+    // CHANGELOG uses ### Added / ### Fixed / ### Changed under each version
+    // section (e.g. ## [0.2.2]). These siblings-only duplicates are fine.
+    "MD024": { "siblings_only": true }
   }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.2] - 2026-05-22
+
+### Fixed
+
+- Add `# pyright: ignore[reportMissingTypeStubs]` inline on `pd_book_tools` import
+  lines in `default_stages.py`. The basedpyright baseline stored column-position-based
+  suppressions that matched Python 3.13 but not Python 3.12, leaving 2 unmatched
+  warnings in CI. Inline ignores are stable across Python versions. Removed 2 now-
+  redundant baseline entries (275 → 273). pd-book-tools is a wheel without `py.typed`
+  (genuinely stubless), so this suppression is correct per workspace conventions.
+
 ## [0.2.1] - 2026-05-19
 
 ### Fixed
