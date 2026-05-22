@@ -38,6 +38,7 @@ See `pd_ocr_ops/schemas/emit.py::PUBLIC_MODELS` for the registration surface.
 
 Full spec: `docs/specs/2026-05-16-cross-cut-design.md` in the workspace.
 
-Plan #7 (upcoming): migrate `pd-prep-for-pgdp`'s `STAGE_IMPL` registry and Modal
-adapters into `pd-ocr-ops` (`LocalStageDispatcher`'s registry is empty in
-Phase 1).
+Phase 1.7 (shipped in v0.2.0): `pd-prep-for-pgdp`'s GPU dispatch primitives
+(`ModalStageDispatcher`, `SharedContainerStageDispatcher`, `register_default_stages()`)
+migrated into `pd-ocr-ops`. The registry now ships DocTR and Tesseract OCR stages
+by default via `register_default_stages()`.
