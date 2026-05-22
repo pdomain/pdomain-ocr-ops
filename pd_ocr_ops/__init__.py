@@ -1,6 +1,8 @@
 """pd-ocr-ops: Suite plumbing and GPU dispatch adapters for the pd-* OCR suite."""
 
-__version__ = "0.1.0"
+from importlib.metadata import version
+
+__version__ = version("pd-ocr-ops")
 
 from pd_ocr_ops.suite.routes import mount_routes
 from pd_ocr_ops.suite.types import SuiteAdapters

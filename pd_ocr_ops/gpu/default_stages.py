@@ -129,7 +129,7 @@ def _make_tesseract_sync(*, image_path: str, page_id: str, language: str) -> Any
                 "Install the [tesseract] extra to use the Tesseract engine."
             )
 
-        image = cv2.imread(image_path)
+        image = cv2.imread(image_path)  # pyright: ignore[reportAttributeAccessIssue]  # cv2 stubs incomplete
         if image is None:
             raise ValueError(f"Could not load image from path: {image_path!r}")
         page = tesseract_ocr_cv2_image(
