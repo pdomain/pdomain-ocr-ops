@@ -99,7 +99,7 @@ def _make_doctr_sync(*, image_path: str, page_id: str) -> Any:
     """Return a zero-arg callable that runs DocTR OCR synchronously."""
 
     def _run() -> dict[str, Any]:
-        from pd_book_tools.ocr.document import (  # pyright: ignore[reportMissingTypeStubs]  # pd-book-tools ships no py.typed
+        from pd_book_tools.ocr.document import (
             Document,
         )
 
@@ -120,7 +120,7 @@ def _make_tesseract_sync(*, image_path: str, page_id: str, language: str) -> Any
 
     def _run() -> dict[str, Any]:
         import cv2
-        from pd_book_tools.ocr.cv2_tesseract import (  # pyright: ignore[reportMissingTypeStubs]  # no py.typed
+        from pd_book_tools.ocr.cv2_tesseract import (
             _pytesseract_available,
             tesseract_ocr_cv2_image,
         )
