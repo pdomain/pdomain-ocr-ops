@@ -12,8 +12,10 @@ and schemas.emit. Imported by every `pd-*` SPA backend.
 | `make local-dev` | switch to local-dev mode (editable `../pd-book-tools` + marker) |
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editable siblings (local-mode only) |
+| `make update-pd-deps` | bump pd-* sibling deps to registry latest; leaves diff for review |
 
 See [workspace `docs/process/local-dev.md`](../docs/process/local-dev.md) for the canonical local-dev pattern (spec #362).
+See [workspace `docs/process/update-pd-deps.md`](../docs/process/update-pd-deps.md) for the sibling-dep refresh pattern (spec #363).
 
 ## docs/ folder
 

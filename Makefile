@@ -30,7 +30,8 @@ endef
 
 .PHONY: help setup lint lint-check format format-check typecheck test ci build clean pre-commit-check dev-local \
         upgrade-deps release-patch release-minor release-major _do-release \
-        local-setup local-dev local-check local-upgrade-deps
+        local-setup local-dev local-check local-upgrade-deps \
+        update-pd-deps
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -106,6 +107,9 @@ local-check: ## Print local-dev mode status + per-sibling resolution
 
 local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode only)
 	@./scripts/local-upgrade-deps.sh
+
+update-pd-deps: ## Bump pd-* sibling deps to registry latest; leaves diff for review
+	@./scripts/update-pd-deps.sh
 
 # ---------------------------------------------------------------------------
 # Releases
