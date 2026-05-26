@@ -2,12 +2,12 @@ from unittest.mock import patch
 
 import filelock
 
-from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
+from pdomain_ocr_ops.suite.registry import LocalTomlSuiteRegistry
 
 _SPEC_EXAMPLE_TOML = """
-[apps.pd-ocr-labeler-spa]
-app_id = "pd-ocr-labeler-spa"
-package = "pd_ocr_labeler_spa"
+[apps.pdomain-ocr-labeler-spa]
+app_id = "pdomain-ocr-labeler-spa"
+package = "pdomain_ocr_labeler_spa"
 version = "0.4.2"
 binary = "/usr/bin/python3"
 default_port = 8001
@@ -31,7 +31,7 @@ def test_read_parses_spec_example(tmp_path, monkeypatch):
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
     assert len(apps) == 1
-    assert apps[0].app_id == "pd-ocr-labeler-spa"
+    assert apps[0].app_id == "pdomain-ocr-labeler-spa"
     assert apps[0].version == "0.4.2"
     assert apps[0].default_port == 8001
 
@@ -59,7 +59,7 @@ registered_at = "2026-01-01T00:00:00+00:00"
     apps = registry.list_installed()
     # stale entry (binary doesn't exist) is dropped from result
     assert len(apps) == 1
-    assert apps[0].app_id == "pd-ocr-labeler-spa"
+    assert apps[0].app_id == "pdomain-ocr-labeler-spa"
 
 
 def test_read_uses_filelock(tmp_path, monkeypatch):

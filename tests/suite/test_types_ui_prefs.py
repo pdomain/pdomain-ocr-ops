@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from pd_ocr_ops.suite.types import CommonUIPrefs, UIPrefs
+from pdomain_ocr_ops.suite.types import CommonUIPrefs, UIPrefs
 
 
 def test_ui_prefs_defaults_match_spec():
@@ -23,7 +23,7 @@ def test_ui_prefs_rejects_bad_font_size():
 
 
 def test_ui_prefs_apps_freeform_dict():
-    apps_data = {"pd-ocr-labeler-spa": {"show_match_diff_default": "fuzzy-and-mismatch"}}
+    apps_data = {"pdomain-ocr-labeler-spa": {"show_match_diff_default": "fuzzy-and-mismatch"}}
     prefs = UIPrefs(apps=apps_data)
     data = prefs.model_dump(mode="json")
     roundtripped = UIPrefs.model_validate(data)

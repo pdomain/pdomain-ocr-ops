@@ -6,7 +6,7 @@ import sys
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pd_ocr_ops.suite.types import InstalledApp
+    from pdomain_ocr_ops.suite.types import InstalledApp
 
 _PLATFORM_MESSAGES = {
     "linux": (

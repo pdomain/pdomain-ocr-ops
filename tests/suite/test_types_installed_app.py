@@ -3,13 +3,13 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from pd_ocr_ops.suite.types import InstalledApp
+from pdomain_ocr_ops.suite.types import InstalledApp
 
 
 def _make_app(**kwargs):
     defaults = {
-        "app_id": "pd-ocr-labeler-spa",
-        "package": "pd_ocr_labeler_spa",
+        "app_id": "pdomain-ocr-labeler-spa",
+        "package": "pdomain_ocr_labeler_spa",
         "version": "0.4.2",
         "binary": "/usr/local/bin/pd-ocr-labeler",
         "default_port": 8001,
@@ -23,7 +23,7 @@ def _make_app(**kwargs):
 
 def test_installed_app_constructs():
     app = _make_app()
-    assert app.app_id == "pd-ocr-labeler-spa"
+    assert app.app_id == "pdomain-ocr-labeler-spa"
     assert app.enabled is True
 
 

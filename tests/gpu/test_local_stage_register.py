@@ -2,7 +2,7 @@ import warnings
 
 import pytest
 
-from pd_ocr_ops.gpu.local_stage import LocalStageDispatcher
+from pdomain_ocr_ops.gpu.local_stage import LocalStageDispatcher
 
 
 async def _fake_impl(page_id, device, **kwargs):

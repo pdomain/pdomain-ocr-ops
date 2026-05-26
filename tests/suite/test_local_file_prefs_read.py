@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import filelock
 
-from pd_ocr_ops.suite.prefs import LocalFilePrefs
+from pdomain_ocr_ops.suite.prefs import LocalFilePrefs
 
 _SPEC_EXAMPLE_JSON = json.dumps(
     {
@@ -21,7 +21,7 @@ _SPEC_EXAMPLE_JSON = json.dumps(
             },
         },
         "apps": {
-            "pd-ocr-labeler-spa": {
+            "pdomain-ocr-labeler-spa": {
                 "show_match_diff_default": "fuzzy-and-mismatch",
             }
         },
@@ -48,7 +48,7 @@ def test_read_parses_spec_example(tmp_path, monkeypatch):
     assert result.common.theme == "dark"
     assert result.common.density == "compact"
     assert result.common.layer_colors.word == "#4a9eff"
-    assert result.apps["pd-ocr-labeler-spa"]["show_match_diff_default"] == "fuzzy-and-mismatch"
+    assert result.apps["pdomain-ocr-labeler-spa"]["show_match_diff_default"] == "fuzzy-and-mismatch"
 
 
 def test_read_unknown_keys_in_common_section_ignored_with_warning(tmp_path, monkeypatch):

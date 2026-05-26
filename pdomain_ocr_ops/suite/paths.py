@@ -1,4 +1,4 @@
-"""XDG-aware path helpers for the pd-suite data directory."""
+"""XDG-aware path helpers for the pdomain-suite data directory."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def suite_data_dir() -> Path:
-    """Return the pd-suite data directory, creating it if needed.
+    """Return the pdomain-suite data directory, creating it if needed.
 
     Respects PD_SUITE_DATA_DIR env var as an override (for tests and containers).
     """
@@ -17,7 +17,7 @@ def suite_data_dir() -> Path:
     else:
         import platformdirs
 
-        path = Path(platformdirs.user_data_dir("pd-suite", appauthor=False))
+        path = Path(platformdirs.user_data_dir("pdomain-suite", appauthor=False))
     path.mkdir(parents=True, exist_ok=True)
     return path
 

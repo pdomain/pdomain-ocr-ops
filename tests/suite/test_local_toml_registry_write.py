@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import filelock
 
-from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
-from pd_ocr_ops.suite.types import InstalledApp
+from pdomain_ocr_ops.suite.registry import LocalTomlSuiteRegistry
+from pdomain_ocr_ops.suite.types import InstalledApp
 
 _NOW = datetime(2026, 1, 1, tzinfo=UTC)
 

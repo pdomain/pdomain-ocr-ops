@@ -1,4 +1,4 @@
-"""Emit JSON Schema for all public Pydantic models in pd_ocr_ops."""
+"""Emit JSON Schema for all public Pydantic models in pdomain_ocr_ops."""
 
 from __future__ import annotations
 
@@ -6,13 +6,13 @@ import json
 
 from pydantic import TypeAdapter
 
-from pd_ocr_ops.gpu.types import JobEvent, JobSpec, JobStatus, StageResult
-from pd_ocr_ops.suite.sibling_spawn import (
+from pdomain_ocr_ops.gpu.types import JobEvent, JobSpec, JobStatus, StageResult
+from pdomain_ocr_ops.suite.sibling_spawn import (
     LaunchResult,
     LaunchResultOpened,
     LaunchResultRequiresHostConfig,
 )
-from pd_ocr_ops.suite.types import (
+from pdomain_ocr_ops.suite.types import (
     CommonUIPrefs,
     InstalledApp,
     LayerColors,
@@ -47,7 +47,7 @@ def emit_schemas() -> dict[str, dict[str, object]]:
         schemas[model_cls.__name__] = adapter.json_schema()
 
     # Emit the discriminated LaunchResult union separately
-    # so the discriminator is preserved for pd-ui's TypeScript generator
+    # so the discriminator is preserved for pdomain-ui's TypeScript generator
     launch_result_adapter = TypeAdapter(LaunchResult)
     schemas["LaunchResult"] = launch_result_adapter.json_schema()
 

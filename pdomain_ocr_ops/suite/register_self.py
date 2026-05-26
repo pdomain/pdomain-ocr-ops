@@ -2,7 +2,7 @@
 
 Each pd-* app calls this at startup to register itself with the
 LocalTomlSuiteRegistry.  Auto-detects app metadata from:
-  - The calling package's ``pd-suite.json`` fragment (via importlib.resources)
+  - The calling package's ``pdomain-suite.json`` fragment (via importlib.resources)
   - ``importlib.metadata.version(package)`` for the version string
   - ``sys.argv[0]`` for the binary path
 
@@ -37,17 +37,17 @@ def register_self(
     _registry_root:
         Override the registry path (tests only).
     **overrides:
-        Field overrides applied on top of the ``pd-suite.json`` fragment
+        Field overrides applied on top of the ``pdomain-suite.json`` fragment
         before constructing the ``InstalledApp``.  Useful for operators
         supplying a custom binary path or port.
 
     Raises:
     ------
     FileNotFoundError
-        When the calling package contains no ``pd-suite.json`` fragment.
+        When the calling package contains no ``pdomain-suite.json`` fragment.
     """
-    from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
-    from pd_ocr_ops.suite.types import InstalledApp
+    from pdomain_ocr_ops.suite.registry import LocalTomlSuiteRegistry
+    from pdomain_ocr_ops.suite.types import InstalledApp
 
     # --- Resolve the caller package ---
     if _caller_package is None:
@@ -63,18 +63,18 @@ def register_self(
     # (assigned in the if-block above when initially None).
     caller_pkg: str = _caller_package or ""
 
-    # --- Read the pd-suite.json fragment ---
+    # --- Read the pdomain-suite.json fragment ---
     try:
         pkg_files = importlib.resources.files(caller_pkg)
-        fragment_file = pkg_files / "pd-suite.json"
+        fragment_file = pkg_files / "pdomain-suite.json"
         # files() returns a Traversable; read_text() raises FileNotFoundError
         # when the resource doesn't exist, but the error message may not
         # mention the package name — we wrap it.
         raw = fragment_file.read_text(encoding="utf-8")
     except (FileNotFoundError, TypeError, ModuleNotFoundError) as exc:
         raise FileNotFoundError(
-            f"pd-suite.json not found in package {caller_pkg!r}. "
-            "Each pd-* app must ship a pd-suite.json resource in its wheel."
+            f"pdomain-suite.json not found in package {caller_pkg!r}. "
+            "Each pd-* app must ship a pdomain-suite.json resource in its wheel."
         ) from exc
 
     fragment: dict[str, Any] = json.loads(raw)
