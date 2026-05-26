@@ -33,16 +33,16 @@ def pick_device() -> Literal["local", "mps", "cpu"]:
     """Return the GPU device to use for this process.
 
     Resolution order:
-    1. PD_GPU_BACKEND env var (explicit override)
+    1. PDOMAIN_GPU_BACKEND env var (explicit override)
     2. PGDP_GPU_BACKEND env var (deprecated alias; warns)
     3. Auto-detection: CUDA -> MPS -> CPU
     """
     # Check canonical env var
-    explicit = os.environ.get("PD_GPU_BACKEND")
+    explicit = os.environ.get("PDOMAIN_GPU_BACKEND")
     if explicit:
         if explicit not in _VALID_DEVICES:
             raise ValueError(
-                f"PD_GPU_BACKEND={explicit!r} is not a valid device. "
+                f"PDOMAIN_GPU_BACKEND={explicit!r} is not a valid device. "
                 f"Allowed: {sorted(_VALID_DEVICES)}"
             )
         return explicit  # pyright: ignore[reportReturnType]  # narrowed by _VALID_DEVICES check above
@@ -51,7 +51,7 @@ def pick_device() -> Literal["local", "mps", "cpu"]:
     legacy = os.environ.get("PGDP_GPU_BACKEND")
     if legacy:
         warnings.warn(
-            f"PGDP_GPU_BACKEND is deprecated; use PD_GPU_BACKEND={legacy!r} instead",
+            f"PGDP_GPU_BACKEND is deprecated; use PDOMAIN_GPU_BACKEND={legacy!r} instead",
             DeprecationWarning,
             stacklevel=2,
         )

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from pd_ocr_ops.suite.routes import mount_routes
-from pd_ocr_ops.suite.types import SuiteAdapters
+from pdomain_ocr_ops.suite.routes import mount_routes
+from pdomain_ocr_ops.suite.types import SuiteAdapters
 
 
 class _SpyPrefs:
@@ -10,7 +10,7 @@ class _SpyPrefs:
         self.write_app_calls = []
 
     def read(self):
-        from pd_ocr_ops.suite.types import UIPrefs
+        from pdomain_ocr_ops.suite.types import UIPrefs
 
         return UIPrefs()
 
@@ -34,14 +34,14 @@ class _FakeRegistry:
 
 class _FakeLauncher:
     async def launch(self, app):
-        from pd_ocr_ops.suite.sibling_spawn import LaunchResultOpened
+        from pdomain_ocr_ops.suite.sibling_spawn import LaunchResultOpened
 
         return LaunchResultOpened(url="http://localhost:8001", spawned=False)
 
 
 class _FakeAuth:
     async def authenticate(self, request):
-        from pd_ocr_ops.suite.auth import Identity
+        from pdomain_ocr_ops.suite.auth import Identity
 
         return Identity(user_id="local", display_name="Local User")
 
@@ -82,11 +82,11 @@ def test_put_app_invokes_write_app():
     mount_routes(app, adapters=_make_adapters(spy))
     client = TestClient(app)
     payload = {"show_match_diff_default": "fuzzy-and-mismatch"}
-    resp = client.put("/api/suite/prefs/apps/pd-ocr-labeler-spa", json=payload)
+    resp = client.put("/api/suite/prefs/apps/pdomain-ocr-labeler-spa", json=payload)
     assert resp.status_code == 204
     assert len(spy.write_app_calls) == 1
     app_id, recorded_payload = spy.write_app_calls[0]
-    assert app_id == "pd-ocr-labeler-spa"
+    assert app_id == "pdomain-ocr-labeler-spa"
     assert recorded_payload == payload
 
 

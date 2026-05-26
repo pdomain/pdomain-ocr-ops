@@ -66,8 +66,8 @@ class JobSpec(BaseModel):
     priority: Literal["interactive", "batch"] = "batch"
 
 
-# ── Phase 1.7 dispatch wire-shapes (lifted from pd-prep-for-pgdp) ────────────
-# Cherry-picked-from: pd-prep-for-pgdp@e36c199df466ff45b70d2a452dd7512dcc2a17c9
+# ── Phase 1.7 dispatch wire-shapes (lifted from pdomain-prep-for-pgdp) ────────────
+# Cherry-picked-from: pdomain-prep-for-pgdp@e36c199df466ff45b70d2a452dd7512dcc2a17c9
 
 
 class DispatchModel(BaseModel):
@@ -75,9 +75,9 @@ class DispatchModel(BaseModel):
 
     Sets json_schema_serialization_defaults_required=True so fields with
     defaults emit as required in OpenAPI serialization schema. Mirrors
-    pd-prep-for-pgdp's ApiModel for the migration window.
+    pdomain-prep-for-pgdp's ApiModel for the migration window.
 
-    History: replicated from pd-prep-for-pgdp ApiModel in Phase 1.7.
+    History: replicated from pdomain-prep-for-pgdp ApiModel in Phase 1.7.
     """
 
     model_config = ConfigDict(json_schema_serialization_defaults_required=True)
@@ -90,7 +90,7 @@ class ProcessPageRequest(DispatchModel):
     idx0: int
     config_overrides: dict[
         str, Any
-    ] = {}  # generic — pd-prep-for-pgdp validates as PageConfigOverrides
+    ] = {}  # generic — pdomain-prep-for-pgdp validates as PageConfigOverrides
     output_context: Literal["workbench", "commit"] = "workbench"
 
 
@@ -154,14 +154,14 @@ class GPUBackend(Protocol):
     """Legacy pgdp-prep-style GPU dispatch Protocol.
 
     Has specific process_page/run_ocr/run_batch methods as used by
-    pd-prep-for-pgdp. Coexists with StageDispatcher (generic run_stage)
+    pdomain-prep-for-pgdp. Coexists with StageDispatcher (generic run_stage)
     during the Phase 1.7 migration window.
 
     NOT an alias for StageDispatcher — they have different method signatures.
     StageDispatcher is the forward-looking generic interface; GPUBackend is
     the pgdp-prep-specific legacy interface retained until pgdp-prep migrates.
 
-    History: moved from pd-prep-for-pgdp adapters/gpu/base.py in Phase 1.7.
+    History: moved from pdomain-prep-for-pgdp adapters/gpu/base.py in Phase 1.7.
     """
 
     name: Literal["local", "cpu", "mps", "modal", "shared_container"]

@@ -14,8 +14,8 @@ from typing import TYPE_CHECKING
 
 import filelock
 
-from pd_ocr_ops.gpu.events import is_event_line, parse_event_line
-from pd_ocr_ops.gpu.types import JobEvent, JobStatus
+from pdomain_ocr_ops.gpu.events import is_event_line, parse_event_line
+from pdomain_ocr_ops.gpu.types import JobEvent, JobStatus
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -74,7 +74,7 @@ class LocalLongJobRunner:
         poll_interval_s: float = 0.5,
     ) -> None:
         if db_path is None:
-            from pd_ocr_ops.suite.paths import jobs_db_path
+            from pdomain_ocr_ops.suite.paths import jobs_db_path
 
             db_path = jobs_db_path()
         self._db_path = Path(db_path)

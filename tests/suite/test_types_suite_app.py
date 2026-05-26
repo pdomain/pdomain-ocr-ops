@@ -1,18 +1,18 @@
 import pytest
 from pydantic import ValidationError
 
-from pd_ocr_ops.suite.types import SuiteApp
+from pdomain_ocr_ops.suite.types import SuiteApp
 
 
 def test_suite_app_constructs_minimum_fields():
     app = SuiteApp(
-        app_id="pd-ocr-labeler-spa",
+        app_id="pdomain-ocr-labeler-spa",
         display_name="OCR Labeler",
-        package="pd_ocr_labeler_spa",
+        package="pdomain_ocr_labeler_spa",
         default_port=8001,
         icon="labeler",
     )
-    assert app.app_id == "pd-ocr-labeler-spa"
+    assert app.app_id == "pdomain-ocr-labeler-spa"
     assert app.description is None
     assert app.binary_name is None
 
@@ -31,9 +31,9 @@ def test_suite_app_extra_fields_forbidden():
 
 def test_suite_app_roundtrip_json():
     app = SuiteApp(
-        app_id="pd-ocr-labeler-spa",
+        app_id="pdomain-ocr-labeler-spa",
         display_name="OCR Labeler",
-        package="pd_ocr_labeler_spa",
+        package="pdomain_ocr_labeler_spa",
         default_port=8001,
         icon="labeler",
         description="Labels OCR output",

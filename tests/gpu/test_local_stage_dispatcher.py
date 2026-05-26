@@ -1,7 +1,7 @@
 import pytest
 
-from pd_ocr_ops.gpu.local_stage import LocalStageDispatcher, UnknownStageError
-from pd_ocr_ops.gpu.types import StageResult
+from pdomain_ocr_ops.gpu.local_stage import LocalStageDispatcher, UnknownStageError
+from pdomain_ocr_ops.gpu.types import StageResult
 
 
 @pytest.mark.asyncio
@@ -20,7 +20,7 @@ async def test_run_stage_unknown_id_raises():
 
 @pytest.mark.asyncio
 async def test_run_stage_dispatches_to_registered_impl(monkeypatch):
-    monkeypatch.setenv("PD_GPU_BACKEND", "cpu")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "cpu")
 
     async def fake(page_id, device, **kwargs):
         return {"foo": "bar"}
@@ -38,7 +38,7 @@ async def test_run_stage_dispatches_to_registered_impl(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_run_stage_falls_through_to_cpu_when_local_missing(monkeypatch):
-    monkeypatch.setenv("PD_GPU_BACKEND", "local")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "local")
 
     async def cpu_impl(page_id, device, **kwargs):
         return {}
@@ -52,7 +52,7 @@ async def test_run_stage_falls_through_to_cpu_when_local_missing(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_run_stage_propagates_kwargs(monkeypatch):
-    monkeypatch.setenv("PD_GPU_BACKEND", "cpu")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "cpu")
     received_kwargs = {}
 
     async def impl(page_id, device, **kwargs):

@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from pd_ocr_ops.gpu import register_default_stages
-from pd_ocr_ops.gpu.local_stage import LocalStageDispatcher
+from pdomain_ocr_ops.gpu import register_default_stages
+from pdomain_ocr_ops.gpu.local_stage import LocalStageDispatcher
 
 
 def test_register_default_stages_registers_ocr_stage() -> None:
@@ -28,7 +28,7 @@ def test_registered_ocr_stage_is_callable() -> None:
 @pytest.mark.asyncio
 async def test_doctr_stage_calls_ocr_via_run_in_executor(monkeypatch: pytest.MonkeyPatch) -> None:
     """The 'ocr'/'cpu' stage with engine='doctr' calls Document.from_image_ocr_via_doctr."""
-    monkeypatch.setenv("PD_GPU_BACKEND", "cpu")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "cpu")
 
     fake_page = MagicMock()
     fake_page.to_dict.return_value = {"words": [], "blocks": []}
@@ -36,7 +36,7 @@ async def test_doctr_stage_calls_ocr_via_run_in_executor(monkeypatch: pytest.Mon
     fake_doc.pages = [fake_page]
 
     with patch(
-        "pd_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
+        "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
         return_value=fake_doc,
     ) as mock_doctr:
         dispatcher = LocalStageDispatcher()
@@ -58,9 +58,9 @@ async def test_doctr_stage_calls_ocr_via_run_in_executor(monkeypatch: pytest.Mon
 @pytest.mark.asyncio
 async def test_tesseract_stage_raises_when_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     """Calling the 'ocr'/'cpu' stage with engine='tesseract' raises ImportError when pytesseract absent."""
-    monkeypatch.setenv("PD_GPU_BACKEND", "cpu")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "cpu")
 
-    import pd_book_tools.ocr.cv2_tesseract as _tess_mod
+    import pdomain_book_tools.ocr.cv2_tesseract as _tess_mod
 
     with patch.object(_tess_mod, "_pytesseract_available", False):
         dispatcher = LocalStageDispatcher()
@@ -78,7 +78,7 @@ async def test_tesseract_stage_raises_when_unavailable(monkeypatch: pytest.Monke
 @pytest.mark.asyncio
 async def test_default_engine_is_doctr(monkeypatch: pytest.MonkeyPatch) -> None:
     """When engine kwarg is omitted, DocTR is used by default."""
-    monkeypatch.setenv("PD_GPU_BACKEND", "cpu")
+    monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "cpu")
 
     fake_page = MagicMock()
     fake_page.to_dict.return_value = {}
@@ -86,7 +86,7 @@ async def test_default_engine_is_doctr(monkeypatch: pytest.MonkeyPatch) -> None:
     fake_doc.pages = [fake_page]
 
     with patch(
-        "pd_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
+        "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
         return_value=fake_doc,
     ) as mock_doctr:
         dispatcher = LocalStageDispatcher()

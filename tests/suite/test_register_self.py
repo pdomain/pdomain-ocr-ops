@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 import pytest
 
-from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
+from pdomain_ocr_ops.suite.registry import LocalTomlSuiteRegistry
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -26,7 +26,7 @@ def _make_fake_pkg(
     fragment: dict,
     version: str = "1.2.3",
 ) -> types.ModuleType:
-    """Create an in-memory fake package with a pd-suite.json fragment.
+    """Create an in-memory fake package with a pdomain-suite.json fragment.
 
     The package has an importlib.resources-compatible file via a
     __spec__.submodule_search_locations pointing to tmp_path/pkg_name.
@@ -34,7 +34,7 @@ def _make_fake_pkg(
     pkg_dir = tmp_path / pkg_name
     pkg_dir.mkdir(parents=True, exist_ok=True)
     (pkg_dir / "__init__.py").write_text("")
-    (pkg_dir / "pd-suite.json").write_text(json.dumps(fragment))
+    (pkg_dir / "pdomain-suite.json").write_text(json.dumps(fragment))
 
     # Register the package in sys.modules
     mod = types.ModuleType(pkg_name)
@@ -67,7 +67,7 @@ def _patch_version(pkg_name: str, version: str):
 
 
 def test_register_self_reads_fragment_from_caller_package(tmp_path, monkeypatch):
-    """register_self() reads pd-suite.json from the calling package."""
+    """register_self() reads pdomain-suite.json from the calling package."""
     pkg_name = "fake_suite_app_reads"
     fragment = {
         "app_id": "pd-fake-app",
@@ -83,7 +83,7 @@ def test_register_self_reads_fragment_from_caller_package(tmp_path, monkeypatch)
     with _patch_version(pkg_name, "1.2.3"):
         with patch("sys.argv", ["/usr/bin/python3"]):
             # Call register_self as if called from inside fake_suite_app_reads
-            from pd_ocr_ops.suite.register_self import register_self
+            from pdomain_ocr_ops.suite.register_self import register_self
 
             register_self(_caller_package=pkg_name, _registry_root=toml_file)
 
@@ -109,7 +109,7 @@ def test_register_self_fills_binary_from_argv(tmp_path, monkeypatch):
 
     with _patch_version(pkg_name, "1.0.0"):
         with patch("sys.argv", [argv_path]):
-            from pd_ocr_ops.suite.register_self import register_self
+            from pdomain_ocr_ops.suite.register_self import register_self
 
             register_self(_caller_package=pkg_name, _registry_root=toml_file)
 
@@ -138,7 +138,7 @@ def test_register_self_fills_version_from_importlib_metadata(tmp_path, monkeypat
 
     with _patch_version(pkg_name, "3.4.5"):
         with patch("sys.argv", ["/usr/bin/python3"]):
-            from pd_ocr_ops.suite.register_self import register_self
+            from pdomain_ocr_ops.suite.register_self import register_self
 
             register_self(_caller_package=pkg_name, _registry_root=toml_file)
 
@@ -165,7 +165,7 @@ def test_register_self_kwargs_override_fragment(tmp_path, monkeypatch):
 
     with _patch_version(pkg_name, "1.0.0"):
         with patch("sys.argv", ["/usr/bin/python3"]):
-            from pd_ocr_ops.suite.register_self import register_self
+            from pdomain_ocr_ops.suite.register_self import register_self
 
             register_self(
                 _caller_package=pkg_name,
@@ -181,12 +181,12 @@ def test_register_self_kwargs_override_fragment(tmp_path, monkeypatch):
 
 
 def test_register_self_missing_fragment_raises_clear_error(tmp_path, monkeypatch):
-    """register_self() raises FileNotFoundError with package name when pd-suite.json missing."""
+    """register_self() raises FileNotFoundError with package name when pdomain-suite.json missing."""
     pkg_name = "fake_suite_app_no_fragment"
     pkg_dir = tmp_path / pkg_name
     pkg_dir.mkdir(parents=True, exist_ok=True)
     (pkg_dir / "__init__.py").write_text("")
-    # No pd-suite.json written
+    # No pdomain-suite.json written
 
     mod = types.ModuleType(pkg_name)
     mod.__package__ = pkg_name
@@ -203,7 +203,7 @@ def test_register_self_missing_fragment_raises_clear_error(tmp_path, monkeypatch
 
     with _patch_version(pkg_name, "1.0.0"):
         with patch("sys.argv", ["/usr/bin/python3"]):
-            from pd_ocr_ops.suite.register_self import register_self
+            from pdomain_ocr_ops.suite.register_self import register_self
 
             with pytest.raises(FileNotFoundError, match=pkg_name):
                 register_self(_caller_package=pkg_name, _registry_root=toml_file)

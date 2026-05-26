@@ -1,4 +1,4 @@
-# CLAUDE — pd-ocr-ops
+# CLAUDE — pdomain-ocr-ops
 
 Python ops library for the `pd-*` suite: suite plumbing (registry, prefs,
 sibling-spawn, desktop), GPU dispatch (StageDispatcher / LongJobRunner),
@@ -9,7 +9,7 @@ and schemas.emit. Imported by every `pd-*` SPA backend.
 | target | does |
 |---|---|
 | `make local-setup` | clone any missing sibling pd-* repos into the workspace |
-| `make local-dev` | switch to local-dev mode (editable `../pd-book-tools` + marker) |
+| `make local-dev` | switch to local-dev mode (editable `../pdomain-book-tools` + marker) |
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editable siblings (local-mode only) |
 | `make update-pd-deps` | bump pd-* sibling deps to registry latest; leaves diff for review |

@@ -160,12 +160,12 @@ class SuiteAdapters(BaseModel):
     @classmethod
     def local(cls) -> SuiteAdapters:
         """Return a fully-wired bundle of local-mode adapters."""
-        from pd_ocr_ops.suite import paths
-        from pd_ocr_ops.suite.auth import NoAuthAdapter
-        from pd_ocr_ops.suite.prefs import LocalFilePrefs
-        from pd_ocr_ops.suite.registry import LocalTomlSuiteRegistry
-        from pd_ocr_ops.suite.sibling_spawn import LocalSpawnLauncher
-        from pd_ocr_ops.suite.storage import LocalFsStorage
+        from pdomain_ocr_ops.suite import paths
+        from pdomain_ocr_ops.suite.auth import NoAuthAdapter
+        from pdomain_ocr_ops.suite.prefs import LocalFilePrefs
+        from pdomain_ocr_ops.suite.registry import LocalTomlSuiteRegistry
+        from pdomain_ocr_ops.suite.sibling_spawn import LocalSpawnLauncher
+        from pdomain_ocr_ops.suite.storage import LocalFsStorage
 
         return cls(
             registry=LocalTomlSuiteRegistry(),

@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from pd_ocr_ops.gpu.types import (
+from pdomain_ocr_ops.gpu.types import (
     BatchJobItem,
     BatchJobResult,
     GPUBackend,

@@ -1,7 +1,7 @@
 def test_top_level_exports_present():
-    from pd_ocr_ops import SuiteAdapters, mount_routes
-    from pd_ocr_ops.gpu import LongJobRunner, StageDispatcher, pick_device
-    from pd_ocr_ops.suite import InstalledApp, SuiteApp, UIPrefs
+    from pdomain_ocr_ops import SuiteAdapters, mount_routes
+    from pdomain_ocr_ops.gpu import LongJobRunner, StageDispatcher, pick_device
+    from pdomain_ocr_ops.suite import InstalledApp, SuiteApp, UIPrefs
 
     assert mount_routes is not None
     assert SuiteAdapters is not None

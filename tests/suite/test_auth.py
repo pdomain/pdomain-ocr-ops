@@ -1,6 +1,6 @@
 import pytest
 
-from pd_ocr_ops.suite.auth import AuthAdapter, Identity, NoAuthAdapter
+from pdomain_ocr_ops.suite.auth import AuthAdapter, Identity, NoAuthAdapter
 
 
 @pytest.mark.asyncio

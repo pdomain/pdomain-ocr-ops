@@ -4,12 +4,12 @@ This is the canonical home for shared-container-based GPU dispatch in the
 pd-* suite. All methods raise ``NotImplementedError`` until the HTTP client
 is wired in a follow-up plan.
 
-Cherry-picked-from: pd-prep-for-pgdp@e36c199df466ff45b70d2a452dd7512dcc2a17c9
+Cherry-picked-from: pdomain-prep-for-pgdp@e36c199df466ff45b70d2a452dd7512dcc2a17c9
 """
 
 from __future__ import annotations
 
-from pd_ocr_ops.gpu.types import (
+from pdomain_ocr_ops.gpu.types import (
     BatchJobItem,
     BatchJobResult,
     BatchProgressCb,

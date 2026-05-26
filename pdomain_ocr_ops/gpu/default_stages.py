@@ -1,9 +1,9 @@
-"""Default stage registration for pd-ocr-ops LocalStageDispatcher.
+"""Default stage registration for pdomain-ocr-ops LocalStageDispatcher.
 
-Wires DocTR and Tesseract CPU runners from pd-book-tools into the
+Wires DocTR and Tesseract CPU runners from pdomain-book-tools into the
 dispatcher.  Call once at app startup::
 
-    from pd_ocr_ops.gpu import LocalStageDispatcher, register_default_stages
+    from pdomain_ocr_ops.gpu import LocalStageDispatcher, register_default_stages
     dispatcher = LocalStageDispatcher()
     register_default_stages(dispatcher)
 
@@ -11,7 +11,7 @@ The stage callable signature expected by LocalStageDispatcher is::
 
     async def impl(page_id: str, device: str, **kwargs) -> dict
 
-Kwargs forwarded by pd-ocr-simple-gui (and any other caller):
+Kwargs forwarded by pdomain-ocr-simple-gui (and any other caller):
 
 * ``image_path: str`` — path to the image file to OCR
 * ``engine: str`` — which engine to use (``"doctr"`` / ``"tesseract"``).
@@ -27,7 +27,7 @@ not the OCR engine name.  Engine selection is a runtime parameter passed via
 * ``("ocr", "cpu")`` — single impl that dispatches to DocTR or Tesseract
   depending on ``kwargs.get("engine", "doctr")``.
 
-If pd-book-tools OCR functions are not available at import time this
+If pdomain-book-tools OCR functions are not available at import time this
 module does *not* raise; unavailable engines are handled gracefully inside
 the impl (an ``ImportError`` is re-raised with a clear message).
 """
@@ -38,7 +38,7 @@ import asyncio
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from pd_ocr_ops.gpu.local_stage import LocalStageDispatcher
+    from pdomain_ocr_ops.gpu.local_stage import LocalStageDispatcher
 
 
 def register_default_stages(dispatcher: LocalStageDispatcher) -> None:
@@ -99,7 +99,7 @@ def _make_doctr_sync(*, image_path: str, page_id: str) -> Any:
     """Return a zero-arg callable that runs DocTR OCR synchronously."""
 
     def _run() -> dict[str, Any]:
-        from pd_book_tools.ocr.document import (
+        from pdomain_book_tools.ocr.document import (
             Document,
         )
 
@@ -120,7 +120,7 @@ def _make_tesseract_sync(*, image_path: str, page_id: str, language: str) -> Any
 
     def _run() -> dict[str, Any]:
         import cv2
-        from pd_book_tools.ocr.cv2_tesseract import (
+        from pdomain_book_tools.ocr.cv2_tesseract import (
             _pytesseract_available,
             tesseract_ocr_cv2_image,
         )
