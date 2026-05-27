@@ -1,5 +1,6 @@
 """Suite plumbing: registry, prefs, launcher, auth, storage, routes."""
 
+from pdomain_ocr_ops.suite.ports import find_available_port
 from pdomain_ocr_ops.suite.register_self import register_self
 from pdomain_ocr_ops.suite.types import (
     CommonUIPrefs,
@@ -17,5 +18,6 @@ __all__ = [
     "SuiteAdapters",
     "SuiteApp",
     "UIPrefs",
+    "find_available_port",
     "register_self",
 ]

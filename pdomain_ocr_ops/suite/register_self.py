@@ -9,6 +9,20 @@ LocalTomlSuiteRegistry.  Auto-detects app metadata from:
 Keyword overrides merge on top of the auto-detected values, so operators
 can supply an explicit binary path or port override without changing the
 fragment.
+
+Canonical SPA bootstrap pattern (dynamic port)::
+
+    from pdomain_ocr_ops.suite import find_available_port, register_self
+
+    PREFERRED_PORT = 8004
+
+    def main() -> None:
+        port = find_available_port(PREFERRED_PORT)
+        register_self(
+            _caller_package="pdomain_ocr_simple_gui",
+            actual_port=port,
+        )
+        uvicorn.run(app, host="127.0.0.1", port=port)
 """
 
 from __future__ import annotations
@@ -25,6 +39,7 @@ def register_self(
     *,
     _caller_package: str | None = None,
     _registry_root: Path | None = None,
+    actual_port: int | None = None,
     **overrides: Any,
 ) -> None:
     """Register the calling package with the suite registry.
@@ -36,6 +51,16 @@ def register_self(
         when calling from a helper module that wraps ``register_self``.
     _registry_root:
         Override the registry path (tests only).
+    actual_port:
+        The port the application is actually serving on.  When supplied,
+        it overrides the ``default_port`` field from ``pdomain-suite.json``
+        so that the registry row records the real bound port rather than
+        the static fragment value.  This is the mechanism SPAs use to
+        report the port they selected with :func:`find_available_port` at
+        startup — cross-app linking reads ``default_port`` from the
+        registry, so the recorded value must match the live port.
+
+        Pass ``None`` (the default) to leave ``default_port`` unchanged.
     **overrides:
         Field overrides applied on top of the ``pdomain-suite.json`` fragment
         before constructing the ``InstalledApp``.  Useful for operators
@@ -86,13 +111,18 @@ def register_self(
     except importlib.metadata.PackageNotFoundError:
         version = "0.0.0"
 
-    # --- Merge: fragment < auto-detected < overrides ---
+    # --- Merge: fragment < auto-detected < overrides < actual_port ---
     fields: dict[str, Any] = {
         "binary": binary,
         "version": version,
         **fragment,
         **overrides,
     }
+    # actual_port is a first-class parameter (not buried in **overrides) so
+    # that callers don't need to know the internal field name.  It wins over
+    # everything, including an explicit default_port in **overrides.
+    if actual_port is not None:
+        fields["default_port"] = actual_port
 
     app = InstalledApp(**fields)
 

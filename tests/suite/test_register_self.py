@@ -236,3 +236,106 @@ def test_register_self_fragment_with_description(tmp_path, monkeypatch):
     matching = [a for a in apps if a.app_id == "pd-desc-app"]
     assert matching, "app not registered"
     assert matching[0].description == "A human-readable description of this app"
+
+
+# ---------------------------------------------------------------------------
+# actual_port override tests (Task 2)
+# ---------------------------------------------------------------------------
+
+
+def test_register_self_actual_port_none_leaves_fragment_port(tmp_path, monkeypatch):
+    """actual_port=None leaves the fragment's default_port unchanged."""
+    pkg_name = "fake_suite_app_port_none"
+    fragment = {
+        "app_id": "pd-port-none-app",
+        "display_name": "Port None App",
+        "package": pkg_name,
+        "default_port": 8100,
+        "icon": "port_none",
+    }
+    _make_fake_pkg(tmp_path, pkg_name, fragment)
+    monkeypatch.setenv("PD_SUITE_DATA_DIR", str(tmp_path))
+    toml_file = tmp_path / "installed.toml"
+
+    with _patch_version(pkg_name, "1.0.0"):
+        with patch("sys.argv", ["/usr/bin/python3"]):
+            from pdomain_ocr_ops.suite.register_self import register_self
+
+            register_self(
+                _caller_package=pkg_name,
+                _registry_root=toml_file,
+                actual_port=None,
+            )
+
+    registry = LocalTomlSuiteRegistry(root=toml_file)
+    apps = registry.list_installed()
+    matching = [a for a in apps if a.app_id == "pd-port-none-app"]
+    assert matching, "app not registered"
+    assert matching[0].default_port == 8100
+
+
+def test_register_self_actual_port_overrides_fragment_port(tmp_path, monkeypatch):
+    """actual_port=8005 overrides the fragment's default_port in the registry row."""
+    pkg_name = "fake_suite_app_port_override"
+    fragment = {
+        "app_id": "pd-port-override-app",
+        "display_name": "Port Override App",
+        "package": pkg_name,
+        "default_port": 8200,
+        "icon": "port_override",
+    }
+    _make_fake_pkg(tmp_path, pkg_name, fragment)
+    monkeypatch.setenv("PD_SUITE_DATA_DIR", str(tmp_path))
+    toml_file = tmp_path / "installed.toml"
+
+    with _patch_version(pkg_name, "1.0.0"):
+        with patch("sys.argv", ["/usr/bin/python3"]):
+            from pdomain_ocr_ops.suite.register_self import register_self
+
+            register_self(
+                _caller_package=pkg_name,
+                _registry_root=toml_file,
+                actual_port=8005,
+            )
+
+    registry = LocalTomlSuiteRegistry(root=toml_file)
+    apps = registry.list_installed()
+    matching = [a for a in apps if a.app_id == "pd-port-override-app"]
+    assert matching, "app not registered"
+    assert matching[0].default_port == 8005
+
+
+def test_register_self_actual_port_not_appended(tmp_path, monkeypatch):
+    """actual_port overrides default_port; it is not added as an extra field."""
+    pkg_name = "fake_suite_app_port_no_append"
+    fragment = {
+        "app_id": "pd-port-no-append-app",
+        "display_name": "Port No-Append App",
+        "package": pkg_name,
+        "default_port": 8300,
+        "icon": "port_no_append",
+    }
+    _make_fake_pkg(tmp_path, pkg_name, fragment)
+    monkeypatch.setenv("PD_SUITE_DATA_DIR", str(tmp_path))
+    toml_file = tmp_path / "installed.toml"
+
+    with _patch_version(pkg_name, "1.0.0"):
+        with patch("sys.argv", ["/usr/bin/python3"]):
+            from pdomain_ocr_ops.suite.register_self import register_self
+
+            # Must not raise (extra="forbid" on InstalledApp would raise if
+            # actual_port leaks through as an extra field)
+            register_self(
+                _caller_package=pkg_name,
+                _registry_root=toml_file,
+                actual_port=9001,
+            )
+
+    registry = LocalTomlSuiteRegistry(root=toml_file)
+    apps = registry.list_installed()
+    matching = [a for a in apps if a.app_id == "pd-port-no-append-app"]
+    assert matching, "app not registered"
+    # Only one port field: default_port should be 9001
+    assert matching[0].default_port == 9001
+    # InstalledApp has no 'actual_port' attribute — confirm it wasn't stored
+    assert not hasattr(matching[0], "actual_port")
