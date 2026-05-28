@@ -77,8 +77,13 @@ def _decode_image(img: np.ndarray | bytes) -> np.ndarray:
     return decoded
 
 
-def _cpu_fallback_single(image: np.ndarray, source_id: str) -> dict[str, Any]:
-    """Run single-image CPU DocTR OCR as a last-resort OOM fallback."""
+def _cpu_fallback_single(image: np.ndarray, source_id: str) -> Any:
+    """Run single-image CPU DocTR OCR as a last-resort OOM fallback.
+
+    Returns a book-tools ``Page``. Raises if OCR yields no page so a
+    failure surfaces rather than silently dropping the image (the worker's
+    one-page-per-input contract must hold).
+    """
     from pdomain_book_tools.ocr.document import Document
 
     doc = Document.from_images_ocr_via_doctr(
@@ -87,8 +92,9 @@ def _cpu_fallback_single(image: np.ndarray, source_id: str) -> dict[str, Any]:
         # No predictor -- stock CPU weights, no VRAM pressure.
     )
     if not doc.pages:
-        return {}
-    return doc.pages[0].to_dict()
+        msg = f"CPU OCR fallback produced no page for source {source_id!r}"
+        raise RuntimeError(msg)
+    return doc.pages[0]
 
 
 def run_doctr_batch(
@@ -98,8 +104,8 @@ def run_doctr_batch(
     device: str,
     build_smaller: Callable[[int, int], Any] | None = None,
     source_identifiers: Sequence[str] | None = None,
-) -> list[dict[str, Any]]:
-    """Run batched DocTR OCR on *images*, returning one page dict per input.
+) -> list[Any]:
+    """Run batched DocTR OCR on *images*, returning one book-tools ``Page`` per input.
 
     Parameters
     ----------
@@ -125,9 +131,12 @@ def run_doctr_batch(
 
     Returns:
     -------
-    list[dict]:
-        One page dict per input image, in the same order as *images*.
-        Each dict is the output of ``Page.to_dict()`` from book-tools.
+    list[Page]:
+        One book-tools ``Page`` per input image, in the same order as
+        *images*. Serialization to dicts is the *dispatcher's* job at its
+        transport boundary (e.g. ``LocalStageDispatcher.run_ocr_batch`` does
+        ``[p.to_dict() for p in ...]``); in-process consumers like
+        pdomain-ocr-cli use the ``Page`` objects directly.
 
     Raises:
     ------
@@ -155,8 +164,7 @@ def run_doctr_batch(
                 source_identifiers=list(source_identifiers),
                 predictor=current_predictor,
             )
-            pages = doc.pages
-            return [p.to_dict() for p in pages]
+            return list(doc.pages)
 
         except Exception as exc:
             if not _is_oom(exc):

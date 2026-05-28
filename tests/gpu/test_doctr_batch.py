@@ -45,7 +45,8 @@ async def test_run_doctr_batch_returns_page_per_image() -> None:
     ):
         result = run_doctr_batch([img_a, img_b], predictor=stub_predictor, device="cpu")
 
-    assert result == [{"page": "a"}, {"page": "b"}]
+    # Worker now returns Page objects; serialization is the dispatcher's job.
+    assert result == [fake_page_a, fake_page_b]
 
 
 @pytest.mark.asyncio
@@ -135,7 +136,7 @@ async def test_run_doctr_batch_accepts_bytes_input() -> None:
     ):
         result = run_doctr_batch([img_bytes], predictor=stub_predictor, device="cpu")
 
-    assert result == [{"decoded": True}]
+    assert result == [fake_page]
     # The decoded image should be a numpy ndarray, not bytes
     assert isinstance(decoded_images[0], np.ndarray)
 
@@ -198,7 +199,7 @@ async def test_oom_once_halves_batch_size_and_succeeds() -> None:
             build_smaller=_build_smaller,
         )
 
-    assert result == [{"ok": True}]
+    assert result == [fake_page]
     # build_smaller was called with halved det_bs
     assert len(build_smaller_calls) == 1
     det_bs_used, _ = build_smaller_calls[0]
@@ -260,7 +261,7 @@ async def test_oom_at_floor_falls_back_to_cpu(caplog: pytest.LogCaptureFixture) 
             build_smaller=_build_smaller_oom,
         )
 
-    assert result == [{"cpu_fallback": True}]
+    assert result == [fake_page]
     assert any("OOM" in r.message or "fallback" in r.message.lower() for r in caplog.records)
 
 

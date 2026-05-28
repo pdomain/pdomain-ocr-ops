@@ -141,7 +141,10 @@ class LocalStageDispatcher:
             return _get_or_build_predictor(d_bs, r_bs)
 
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
+        # The worker returns book-tools Page objects; serialize to dicts here
+        # at the dispatcher's transport boundary (a remote backend would
+        # serialize identically before sending results over the wire).
+        pages = await loop.run_in_executor(
             None,
             lambda: run_doctr_batch(
                 req.images,
@@ -151,3 +154,4 @@ class LocalStageDispatcher:
                 source_identifiers=req.source_identifiers,
             ),
         )
+        return [p.to_dict() for p in pages]
