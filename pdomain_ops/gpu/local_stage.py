@@ -52,12 +52,21 @@ class LocalStageDispatcher:
         """Remove a stage implementation."""
         self._registry.pop((stage_id, device), None)
 
-    async def run_stage(self, stage_id: str, page_id: str, **kwargs: Any) -> StageResult:
+    async def run_stage(
+        self,
+        stage_id: str,
+        page_id: str,
+        *,
+        device: str | None = None,
+        **kwargs: Any,
+    ) -> StageResult:
         """Dispatch a stage call to the registered implementation.
 
-        Fallthrough order: pick_device() -> "cpu" (if device not in registry).
+        When *device* is given (e.g. a user CPU/GPU choice), it overrides
+        auto-detection. Otherwise pick_device() chooses.
+        Fallthrough order: requested/detected device -> "cpu" (if not in registry).
         """
-        device = pick_device()
+        device = device or pick_device()
 
         # Try preferred device first, fall through to cpu
         impl = self._registry.get((stage_id, device))
