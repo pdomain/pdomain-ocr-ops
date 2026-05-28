@@ -126,7 +126,12 @@ class LocalStageDispatcher:
             cache_key = (str(det_path), str(reco_path), d_bs, r_bs)
             predictor = _predictor_cache.get(cache_key)
             if predictor is None:
-                predictor = get_finetuned_torch_doctr_predictor(str(det_path), str(reco_path))
+                predictor = get_finetuned_torch_doctr_predictor(
+                    str(det_path),
+                    str(reco_path),
+                    det_bs=d_bs,
+                    reco_bs=r_bs,
+                )
                 _predictor_cache[cache_key] = predictor
             return predictor
 

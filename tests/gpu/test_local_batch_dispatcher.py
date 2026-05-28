@@ -37,7 +37,7 @@ async def test_local_run_ocr_batch_returns_page_dicts(monkeypatch: pytest.Monkey
     monkeypatch.setattr(
         _doctr_support,
         "get_finetuned_torch_doctr_predictor",
-        lambda d, r: sentinel_predictor,
+        lambda d, r, det_bs=2, reco_bs=128: sentinel_predictor,
     )
 
     dispatcher = LocalStageDispatcher()
@@ -93,7 +93,7 @@ async def test_local_run_ocr_batch_uses_book_tools_batched_ocr(
     monkeypatch.setattr(
         _doctr_support,
         "get_finetuned_torch_doctr_predictor",
-        lambda d, r: sentinel_predictor,
+        lambda d, r, det_bs=2, reco_bs=128: sentinel_predictor,
     )
 
     dispatcher = LocalStageDispatcher()
