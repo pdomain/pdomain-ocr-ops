@@ -30,7 +30,7 @@ pd_release_main() {
         exit 2
     fi
 
-    git fetch origin "$RELEASE_BRANCH" --tags --quiet
+    git fetch --force origin "$RELEASE_BRANCH" --tags --quiet
 
     if [ "$FORCE" != "1" ]; then
         if [ -n "$(git status --porcelain)" ]; then
