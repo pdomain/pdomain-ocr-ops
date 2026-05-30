@@ -28,7 +28,8 @@ define _require_peer_book_tools
 	fi
 endef
 
-.PHONY: help setup lint lint-check format format-check typecheck test ci ci-slow build clean pre-commit-check dev-local \
+.PHONY: help setup remove-venv reset reset-venv reset-full \
+        lint lint-check format format-check typecheck test ci ci-slow build clean pre-commit-check dev-local \
         upgrade-deps release-patch release-minor release-major _do-release \
         local-setup local-dev local-check local-upgrade-deps \
         update-pd-deps
@@ -40,6 +41,29 @@ help: ## Show this help message
 setup: ## Install dependencies (idempotent)
 	uv sync --group dev
 	@[ -f .git/hooks/pre-commit ] || uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
+
+reset-venv: reset ## Alias for reset
+
+remove-venv: ## Remove the virtual environment
+	@echo "Removing existing virtual environment..."
+	rm -rf .venv
+	@echo "Virtual environment removed."
+
+reset: ## Rebuild virtual environment (keeps UV cache)
+	@$(MAKE) --no-print-directory clean
+	@$(MAKE) --no-print-directory remove-venv
+	@$(MAKE) --no-print-directory setup
+	@echo "Environment reset."
+
+reset-full: ## Nuclear option: clear everything and redownload
+	@echo "FULL RESET: clearing all caches and virtual environment..."
+	@$(MAKE) --no-print-directory clean
+	@$(MAKE) --no-print-directory remove-venv
+	@echo "Clearing UV cache..."
+	uv cache clean
+	@echo "Dependencies should download fresh now."
+	@$(MAKE) --no-print-directory setup
+	@echo "Full reset complete."
 
 lint: ## Run linting (auto-fix)
 	uv run ruff check --select I --fix
@@ -85,8 +109,8 @@ dev-local: ## [local-dev] Install pdomain-book-tools from ../pdomain-book-tools 
 	@touch .venv/.pd-dev-local
 	@echo "Local editable pdomain-book-tools is active in the venv."
 
-clean: ## Clean cache and temporary files
-	rm -rf dist .venv .pytest_cache .ruff_cache .ci-ai.log htmlcov
+clean: ## Clean cache and temporary files (keeps venv and UV cache)
+	rm -rf dist .pytest_cache .ruff_cache .ci-ai.log htmlcov
 
 upgrade-deps: ## Upgrade dependencies and sync local environment
 	@echo "Upgrading dependency lockfile..."
