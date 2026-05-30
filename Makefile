@@ -85,7 +85,7 @@ test: ## Run tests with parallelization
 	uv run pytest -n auto
 
 pre-commit-check: ## Run all pre-commit hooks against all files (read-only check)
-	uv run pre-commit run --all-files
+	SKIP=basedpyright uv run pre-commit run --all-files
 
 ci: ## Run complete CI pipeline (setup, pre-commit, lint-check, format-check, typecheck, test)
 	@$(MAKE) --no-print-directory setup

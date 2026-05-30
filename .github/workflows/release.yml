@@ -18,6 +18,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   UV_PYTHON: "3.12"
   CUDA_VISIBLE_DEVICES: ""
+  SKIP: basedpyright
 
 jobs:
   release-ci:
