@@ -28,7 +28,7 @@ define _require_peer_book_tools
 	fi
 endef
 
-.PHONY: help setup lint lint-check format format-check typecheck test ci build clean pre-commit-check dev-local \
+.PHONY: help setup lint lint-check format format-check typecheck test ci ci-slow build clean pre-commit-check dev-local \
         upgrade-deps release-patch release-minor release-major _do-release \
         local-setup local-dev local-check local-upgrade-deps \
         update-pd-deps
@@ -70,6 +70,8 @@ ci: ## Run complete CI pipeline (setup, pre-commit, lint-check, format-check, ty
 	@$(MAKE) --no-print-directory format-check
 	@$(MAKE) --no-print-directory typecheck
 	@$(MAKE) --no-print-directory test
+
+ci-slow: ci build ## Full pre-flight for releases (CI plus package build)
 
 build: ## Build the project
 	uv build
@@ -116,20 +118,19 @@ update-pd-deps: ## Bump pd-* sibling deps to registry latest; leaves diff for re
 # Releases
 # ---------------------------------------------------------------------------
 
-release-patch: ## Release: bump patch, run ci, tag, push (e.g. v0.1.0 → v0.1.1)
+release-patch: ## Release: bump patch, run ci-slow, tag, push (e.g. v0.1.0 → v0.1.1)
 	@$(MAKE) --no-print-directory _do-release BUMP=patch
 
-release-minor: ## Release: bump minor, run ci, tag, push (e.g. v0.1.0 → v0.2.0)
+release-minor: ## Release: bump minor, run ci-slow, tag, push (e.g. v0.1.0 → v0.2.0)
 	@$(MAKE) --no-print-directory _do-release BUMP=minor
 
-release-major: ## Release: bump major, run ci, tag, push (e.g. v0.1.0 → v1.0.0)
+release-major: ## Release: bump major, run ci-slow, tag, push (e.g. v0.1.0 → v1.0.0)
 	@$(MAKE) --no-print-directory _do-release BUMP=major
 
-# scripts/do-release.sh handles repo-state guards, runs the ci pre-flight,
-# creates a three-component tag, pushes main + tag, and triggers the
-# GitHub release workflow via `gh workflow run`.
+# scripts/do-release.sh handles repo-state guards, runs the ci-slow pre-flight,
+# creates a three-component tag, and pushes main + tag.
 # Pass FORCE=1 to skip the repo-state guards (pre-flight still runs).
-# Pass SKIP_PUSH=1 to create the tag locally without pushing (dry-run).
+# Pass SKIP_PUSH=1 to create the tag locally without pushing.
 _do-release:
 	@BUMP=$(or $(BUMP),minor) ./scripts/do-release.sh
 

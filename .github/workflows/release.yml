@@ -1,104 +1,92 @@
 name: release
 
-# Triggered by an annotated tag push (`v*`). The local pre-flight
-# (`scripts/do-release.sh` → `make ci`) is the primary safety net;
-# this workflow is the build + publish step.
-#
-# Steps:
-#   1. Check out at full depth (cheap insurance — hatchling reads version
-#      from pyproject.toml today, but if we ever swap to hatch-vcs the
-#      full history will already be present).
-#   2. Build wheel + sdist with uv.
-#   3. Attest build provenance via Sigstore (actions/attest-build-provenance).
-#   4. Publish a GitHub Release with auto-generated notes and attach
-#      dist/*.whl + dist/*.tar.gz as assets.
-#   5. Ping pdomain/pdomain-index-pip so the self-hosted PEP 503 simple
-#      index regenerates immediately instead of waiting up to 15 min for
-#      its cron. Non-fatal: the index has a 15-min cron safety net.
-#
-# Downstream consumers resolve this wheel via the pdomain-index-pip simple
-# index — there is no PyPI publish.
+# Dispatch-only release. scripts/do-release.sh pushes the exact tag after
+# local ci-slow passes, then triggers this workflow with the tag input below.
+# Chore: review pinned action SHAs weekly. Update version comments and SHAs together.
 
 on:
-  push:
-    tags: ["v*"]
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to release (e.g. v0.2.3)"
+        description: "Tag to release, for example v1.2.3"
         required: true
 
 permissions:
   contents: read
 
-# Opt into Node 24 now; Node 20 is deprecated on the runner and will be
-# the default in June 2026. Most pinned actions below are still on Node
-# 20 today (no Node-24-native release available yet) — this env var
-# forces them onto 24 preemptively.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_PYTHON: "3.12"
+  CUDA_VISIBLE_DEVICES: ""
 
 jobs:
-  release:
-    name: build + publish GitHub Release
+  release-ci:
+    name: release CI
     runs-on: ubuntu-latest
-    permissions:
-      contents: write       # softprops/action-gh-release needs this to create the Release
-      id-token: write       # required by attest-build-provenance for Sigstore
-      attestations: write   # required by attest-build-provenance to upload the attestation
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
-          fetch-depth: 0  # harmless today, future-proof if we adopt hatch-vcs
-          ref: ${{ github.event.inputs.tag || github.ref }}
-
-      - uses: astral-sh/setup-uv@v8.1.0
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
         with:
-          version: latest
-
+          version: "0.11.16"
       - name: Set up Python
         run: uv python install 3.12
+      - name: Run release CI gate
+        run: make ci-slow
 
-      - name: Build sdist + wheel
-        run: uv build
+  publish:
+    name: publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: [release-ci]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          version: "0.11.16"
+      - name: Set up Python
+        run: uv python install 3.12
+      - name: Build release artifacts
+        run: make build
 
       - name: List built artifacts
         run: ls -la dist/
 
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: "dist/*"
-
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          generate_release_notes: true
-          files: |
-            dist/*.whl
-            dist/*.tar.gz
-          fail_on_unmatched_files: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(dist/*.whl dist/*.tar.gz)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::no release artifacts found under dist/"
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" "${files[@]}" \
+            --generate-notes \
+            --verify-tag
 
-      # Notify pdomain/pdomain-index-pip so it regenerates the PEP 503
-      # simple index right away. Without this, the index catches up via
-      # its 15-min cron — fine, just slower for downstream installers.
-      #
-      # Requires repo secret PDOMAIN_INDEX_DISPATCH_TOKEN (fine-grained PAT
-      # with `Contents: read` + `Metadata: read` on
-      # pdomain/pdomain-index-pip). The `|| echo ::warning::` makes this
-      # non-fatal: if the secret is missing or the PAT is misconfigured,
-      # the release still succeeds.
       - name: Notify pd-index of new release
         env:
-          GH_TOKEN: ${{ secrets.PDOMAIN_INDEX_DISPATCH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PDOMAIN_INDEX_DISPATCH }}
+          RELEASE_TAG: ${{ github.event.inputs.tag }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::PDOMAIN_INDEX_DISPATCH_TOKEN is not set; index will catch up via 15-min cron"
+            echo "::warning::PDOMAIN_INDEX_DISPATCH is not set; index will catch up via daily cron"
             exit 0
           fi
           gh api -X POST /repos/pdomain/pdomain-index-pip/dispatches \
             -f event_type=pd-release-published \
-            -F 'client_payload[repo]=pdomain-ocr-ops' \  # TODO Phase B: update to pdomain-ops after repo rename
-            -F "client_payload[tag]=${{ github.event.inputs.tag || github.ref_name }}" || \
-            echo "::warning::pdomain-index-pip dispatch failed; index will catch up via 15-min cron"
+            -F 'client_payload[repo]=pdomain-ops' \
+            -F "client_payload[tag]=$RELEASE_TAG" || \
+            echo "::warning::pdomain-index-pip dispatch failed; index will catch up via daily cron"

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.1] - 2026-05-30
+
+### Added
+
+- VRAM-aware batched OCR dispatch for the local `StageDispatcher`, including
+  DocTR batch-size selection, a shared `run_doctr_batch` worker, sized predictor
+  caching, and OOM backoff with CPU fallback.
+- Batch request/response DTOs and a `StageDispatcher.run_ocr_batch` Protocol
+  seam so future remote dispatchers can implement the same interface.
+
+### Fixed
+
+- Release metadata now points at `pdomain/pdomain-ops` after the repo rename.
+- The release workflow now dispatches the `pdomain-ops` package name to
+  `pdomain-index-pip`.
+- The `pdomain-book-tools` dependency floor now requires `0.15.1`, the first
+  release with batched DocTR APIs used by this package.
+
 ## [0.3.0] - 2026-05-27
 
 ### Breaking

@@ -16,7 +16,7 @@ dependencies = [
     "fastapi>=0.110",
     "filelock>=3.13",
     "httpx>=0.27",
-    "pdomain-book-tools>=0.14.1",
+    "pdomain-book-tools>=0.15.1",
     "platformdirs>=4.2",
     "pydantic>=2.5",
     "tomli>=2.0",
@@ -31,8 +31,8 @@ modal = ["modal>=0.66"]
 pdomain-ops-schemas = "pdomain_ops.schemas.emit:main"
 
 [project.urls]
-Homepage = "https://github.com/ConcaveTrillion/pdomain-ocr-ops"
-Source = "https://github.com/ConcaveTrillion/pdomain-ocr-ops"
+Homepage = "https://github.com/pdomain/pdomain-ops"
+Source = "https://github.com/pdomain/pdomain-ops"
 
 [tool.hatch.version]
 source = "vcs"

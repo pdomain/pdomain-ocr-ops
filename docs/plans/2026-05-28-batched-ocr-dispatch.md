@@ -1,13 +1,16 @@
----
+# Batched OCR Dispatch — VRAM-aware GPU batching with OOM backoff
+
+```yaml
 repo: ConcaveTrillion/ocr-container-meta
 plan_type: cross-cut
 status: waves-1-4-done-wave-5-deferred
 synced: never
----
+```
 
 > **Implementation status (2026-05-28).** Waves 1–4 are implemented and merged
 > locally (unpushed) across pdomain-book-tools, pdomain-ops, pdomain-ocr-simple-gui,
 > and pdomain-ocr-cli:
+>
 > - **Task 1** ✅ book-tools `det_bs`/`reco_bs` kwargs + `from_images_ocr_via_doctr`.
 > - **Task 2** ✅ ops `pick_doctr_batch_sizes`.
 > - **Task 3** ✅ ops shared `run_doctr_batch` worker (returns `Page` objects) +
@@ -27,8 +30,6 @@ synced: never
 > sibling path to `{ index = "pdomain-index-pip" }`.
 
 ---
-
-# Batched OCR Dispatch — VRAM-aware GPU batching with OOM backoff
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development or
 > superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox
@@ -130,6 +131,7 @@ for chunk in chunks(pages, chunk_size):
 ```
 
 Three nested resilience levels:
+
 1. **Inside a chunk:** CUDA OOM → halve `det_bs`, rebuild, retry; floor → CPU fallback.
 2. **Per chunk:** any other exception fails only that chunk's pages; the loop continues.
 3. **Progress:** a status callback per chunk; a late failure never erases earlier success.
@@ -145,6 +147,7 @@ def _is_oom(e: BaseException) -> bool:
         return True
     return isinstance(e, RuntimeError) and "out of memory" in str(e).lower()
 ```
+
 On CPU, also treat `MemoryError` as the backoff trigger. **Re-raise anything that is not
 OOM** so real bugs surface. Before rebuilding, `del` the old predictor reference and call
 `torch.cuda.empty_cache()` so the failed allocation's reserved blocks are released —
@@ -203,7 +206,7 @@ independent (different repos/files, no shared state) and run **concurrently, eac
 git worktree** (`superpowers:using-git-worktrees`); waves run **sequentially** because a
 later wave consumes an earlier wave's API.
 
-```
+```text
 Wave 1 (parallel):   Task 1 (book-tools batch kwargs)   ║   Task 2 (ops pick_doctr_batch_sizes)
                               │                                        │
                               └──────────────┬─────────────────────────┘
@@ -239,6 +242,7 @@ Set `model: sonnet` on implementers.
 **Repo:** `pdomain-book-tools` · **Worktree:** `.claude/worktrees/batch-kwargs` · **Model:** sonnet
 
 **Files:**
+
 - Modify: `pdomain_book_tools/ocr/doctr_support.py` (`get_finetuned_torch_doctr_predictor`,
   `get_default_doctr_predictor`, `_assemble_doctr_predictor` at line 187)
 - Modify: `pdomain_book_tools/ocr/document.py` (add `Document.from_images_ocr_via_doctr`;
@@ -280,6 +284,7 @@ Set `model: sonnet` on implementers.
 **Repo:** `pdomain-ops` · **Worktree:** `.claude/worktrees/batch-sizing` · **Model:** sonnet
 
 **Files:**
+
 - Modify: `pdomain_ops/gpu/device.py` (add `pick_doctr_batch_sizes`; reuse existing
   `_cuda_free_bytes`, `_physical_cores`), `pdomain_ops/gpu/__init__.py` (export)
 - Test: `tests/gpu/test_pick_doctr_batch_sizes.py` (new)
@@ -316,6 +321,7 @@ worker, the Protocol batch method, and data-carrying DTOs — with the **Local**
 and the **remote** dispatchers left as Protocol-conformant deferred stubs.
 
 **Files:**
+
 - Create: `pdomain_ops/gpu/doctr_batch.py` (the shared `run_doctr_batch` worker)
 - Modify: `pdomain_ops/gpu/types.py` (batch request/response DTO carrying image **bytes** —
   reuse/extend the existing `OcrPageRequest`/`OcrPageResponse`)
@@ -381,6 +387,7 @@ and the **remote** dispatchers left as Protocol-conformant deferred stubs.
 **Depends on:** Task 3 (batch stage).
 
 **Files:**
+
 - Modify: `src/pdomain_ocr_simple_gui/pipeline.py` (`run_project` — replace the Phase-1
   asyncio worker pool with the chunked loop; remove `resolve_concurrency`/`Semaphore`)
 - Modify: `src/pdomain_ocr_simple_gui/models.py`, `src/pdomain_ocr_simple_gui/routes/jobs.py`
@@ -421,12 +428,16 @@ and the **remote** dispatchers left as Protocol-conformant deferred stubs.
 Independent once Task 3 exists; parallel, different repos. Not required for the first cut.
 
 ### Task 5: pdomain-ocr-cli adopts the batch stage
+
 **Repo:** `pdomain-ocr-cli` · **Worktree:** `.claude/worktrees/batch-adopt` · **Model:** sonnet
+
 - [ ] Route whole-book OCR through the `StageDispatcher` batch method; chunk by
       `batch_pages`; same OOM resilience. TDD against a stub dispatcher. `make ci AI=1`. Commit.
 
 ### Task 6: labeler-spa / trainer-spa re-OCR via batch stage
+
 **Repos:** `pdomain-ocr-labeler-spa`, `pdomain-ocr-trainer-spa` (separate worktrees) · **Model:** sonnet
+
 - [ ] On-demand re-OCR routes through the batch stage (chunk size 1 is fine — they gain OOM
       resilience for free). TDD per repo. Commit.
 
@@ -439,7 +450,9 @@ dispatcher implements the same `StageDispatcher` batch method and calls the shar
 `run_doctr_batch` worker GPU-side. Captured here so the deferred stubs have a destination.
 
 ### Task 7 (deferred): Modal / server batch backends
+
 **Repo:** `pdomain-ops` · **Model:** sonnet
+
 - [ ] Wire `modal_app.run_batch` to import and call `run_doctr_batch` (the shared worker),
       with model warm-load via `@modal.enter()` instead of the module cache.
 - [ ] Implement `ModalStageDispatcher` / `SharedContainerStageDispatcher` batch methods
