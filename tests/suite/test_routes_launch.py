@@ -110,33 +110,33 @@ def test_launch_unknown_app_returns_404():
 
 
 def test_launch_disabled_app_returns_409():
-    installed = _make_installed("pd-app-a", enabled=False)
+    installed = _make_installed("pdomain-app-a", enabled=False)
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed]))
     client = TestClient(app)
-    resp = client.post("/api/suite/launch?app_id=pd-app-a")
+    resp = client.post("/api/suite/launch?app_id=pdomain-app-a")
     assert resp.status_code == 409
 
 
 def test_launch_calls_launcher_with_app():
-    installed = _make_installed("pd-app-a")
+    installed = _make_installed("pdomain-app-a")
     spy = _SpyLauncher(LaunchResultOpened(url="http://localhost:8001", spawned=True, pid=12345))
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed], launcher=spy))
     client = TestClient(app)
-    resp = client.post("/api/suite/launch?app_id=pd-app-a")
+    resp = client.post("/api/suite/launch?app_id=pdomain-app-a")
     assert resp.status_code == 200
     assert len(spy.launched_apps) == 1
-    assert spy.launched_apps[0].app_id == "pd-app-a"
+    assert spy.launched_apps[0].app_id == "pdomain-app-a"
 
 
 def test_launch_already_running_no_spawn():
-    installed = _make_installed("pd-app-a")
+    installed = _make_installed("pdomain-app-a")
     spy = _SpyLauncher(LaunchResultOpened(url="http://localhost:8001", spawned=False))
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed], launcher=spy))
     client = TestClient(app)
-    resp = client.post("/api/suite/launch?app_id=pd-app-a")
+    resp = client.post("/api/suite/launch?app_id=pdomain-app-a")
     assert resp.status_code == 200
     data = resp.json()
     assert data["spawned"] is False

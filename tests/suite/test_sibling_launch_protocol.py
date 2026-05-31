@@ -14,6 +14,6 @@ def test_launch_result_discriminated():
     assert opened.kind == "opened"
     assert opened.spawned is True
 
-    requires_host = LaunchResultRequiresHostConfig(sibling_id="pd-app-a")
+    requires_host = LaunchResultRequiresHostConfig(sibling_id="pdomain-app-a")
     assert requires_host.kind == "requires-host-config"
-    assert requires_host.sibling_id == "pd-app-a"
+    assert requires_host.sibling_id == "pdomain-app-a"

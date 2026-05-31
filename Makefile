@@ -32,7 +32,7 @@ endef
         lint lint-check format format-check typecheck test ci ci-slow build clean pre-commit-check dev-local \
         upgrade-deps release-patch release-minor release-major _do-release \
         local-setup local-dev local-check local-upgrade-deps \
-        update-pd-deps
+        update-pdomain-deps
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -106,7 +106,7 @@ dev-local: ## [local-dev] Install pdomain-book-tools from ../pdomain-book-tools 
 	UV_LINK_MODE=copy uv pip install -e "$(PEER_BOOK_TOOLS)"
 	UV_LINK_MODE=copy uv pip install -e . --no-deps
 	UV_LINK_MODE=copy uv pip install --group dev
-	@touch .venv/.pd-dev-local
+	@touch .venv/.pdomain-dev-local
 	@echo "Local editable pdomain-book-tools is active in the venv."
 
 clean: ## Clean cache and temporary files (keeps venv and UV cache)
@@ -123,7 +123,7 @@ upgrade-deps: ## Upgrade dependencies and sync local environment
 # Local-dev mode (sibling editable installs)
 # ---------------------------------------------------------------------------
 
-local-setup: ## Clone any missing sibling pd-* repos into the workspace
+local-setup: ## Clone any missing sibling pdomain-* repos into the workspace
 	@./scripts/local-setup.sh
 
 local-dev: ## Switch to local-dev mode (siblings editable + marker)
@@ -135,8 +135,8 @@ local-check: ## Print local-dev mode status + per-sibling resolution
 local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode only)
 	@./scripts/local-upgrade-deps.sh
 
-update-pd-deps: ## Bump pd-* sibling deps to registry latest; leaves diff for review
-	@./scripts/update-pd-deps.sh
+update-pdomain-deps: ## Bump pdomain-* sibling deps to registry latest; leaves diff for review
+	@./scripts/update-pdomain-deps.sh
 
 # ---------------------------------------------------------------------------
 # Releases

@@ -1,6 +1,6 @@
 """register_self() — one-liner app registration helper.
 
-Each pd-* app calls this at startup to register itself with the
+Each pdomain-* app calls this at startup to register itself with the
 LocalTomlSuiteRegistry.  Auto-detects app metadata from:
   - The calling package's ``pdomain-suite.json`` fragment (via importlib.resources)
   - ``importlib.metadata.version(package)`` for the version string
@@ -99,7 +99,7 @@ def register_self(
     except (FileNotFoundError, TypeError, ModuleNotFoundError) as exc:
         raise FileNotFoundError(
             f"pdomain-suite.json not found in package {caller_pkg!r}. "
-            "Each pd-* app must ship a pdomain-suite.json resource in its wheel."
+            "Each pdomain-* app must ship a pdomain-suite.json resource in its wheel."
         ) from exc
 
     fragment: dict[str, Any] = json.loads(raw)

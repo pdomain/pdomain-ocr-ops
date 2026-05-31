@@ -77,7 +77,7 @@ def _make_adapters(prefs=None):
 
 
 def test_get_prefs_returns_full_shape():
-    prefs_with_apps = UIPrefs(apps={"pd-app-a": {"setting": "value"}})
+    prefs_with_apps = UIPrefs(apps={"pdomain-app-a": {"setting": "value"}})
     spy = _SpyPrefs(prefs_with_apps)
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters(spy))
@@ -87,7 +87,7 @@ def test_get_prefs_returns_full_shape():
     data = resp.json()
     assert "common" in data
     assert "apps" in data
-    assert data["apps"]["pd-app-a"]["setting"] == "value"
+    assert data["apps"]["pdomain-app-a"]["setting"] == "value"
 
 
 def test_put_common_invokes_write_common():

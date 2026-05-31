@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pdomain-ops"
 dynamic = ["version"]
-description = "Suite plumbing and GPU dispatch adapters for the pd-* suite"
+description = "Suite plumbing and GPU dispatch adapters for the pdomain-* suite"
 authors = [
     { name = "CT", email = "concavetrillion@gmail.com" }
 ]

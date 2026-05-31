@@ -3,7 +3,7 @@ import pytest
 from pdomain_ops.gpu.device import pick_device
 
 
-def test_picks_local_when_pd_gpu_backend_local(monkeypatch):
+def test_picks_local_when_pdomain_gpu_backend_local(monkeypatch):
     monkeypatch.setenv("PDOMAIN_GPU_BACKEND", "local")
     monkeypatch.delenv("PGDP_GPU_BACKEND", raising=False)
     assert pick_device() == "local"

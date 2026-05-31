@@ -1,6 +1,6 @@
 """Port-availability helper for SPA bootstrap.
 
-pd-* SPAs call ``find_available_port`` at startup to avoid ``EADDRINUSE``
+pdomain-* SPAs call ``find_available_port`` at startup to avoid ``EADDRINUSE``
 crashes when the preferred port is already taken by another process.
 """
 

@@ -12,13 +12,13 @@ _NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 def _make_installed(port: int = 8001) -> InstalledApp:
     return InstalledApp(
-        app_id="pd-app-a",
-        package="pd_app_a",
+        app_id="pdomain-app-a",
+        package="pdomain_app_a",
         version="1.0.0",
         binary="/usr/bin/python3",
         default_port=port,
         icon="test",
-        display_name="pd-app-a",
+        display_name="pdomain-app-a",
         registered_at=_NOW,
     )
 
@@ -34,7 +34,7 @@ async def _mock_get_fail(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_spawn_inherits_pd_suite_data_dir(tmp_path, monkeypatch):
+async def test_spawn_inherits_pdomain_suite_data_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("PD_SUITE_DATA_DIR", str(tmp_path))
     app = _make_installed()
     launcher = LocalSpawnLauncher()

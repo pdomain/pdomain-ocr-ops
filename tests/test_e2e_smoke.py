@@ -25,8 +25,8 @@ def test_e2e_mount_routes_real_fastapi_app(tmp_path, monkeypatch):
     # Register an app via LocalTomlSuiteRegistry
     registry = LocalTomlSuiteRegistry(root=tmp_path / "installed.toml")
     installed = InstalledApp(
-        app_id="pd-test-app",
-        package="pd_test_app",
+        app_id="pdomain-test-app",
+        package="pdomain_test_app",
         version="1.0.0",
         binary="/usr/bin/python3",
         default_port=8001,
@@ -43,7 +43,7 @@ def test_e2e_mount_routes_real_fastapi_app(tmp_path, monkeypatch):
     assert resp.status_code == 200
     data = resp.json()
     assert len(data) == 1
-    assert data[0]["app_id"] == "pd-test-app"
+    assert data[0]["app_id"] == "pdomain-test-app"
 
     # PUT /api/suite/prefs/common -> 204
     common_payload = {

@@ -1,4 +1,4 @@
-"""pdomain-ops: Suite plumbing and GPU dispatch adapters for the pd-* suite."""
+"""pdomain-ops: Suite plumbing and GPU dispatch adapters for the pdomain-* suite."""
 
 from importlib.metadata import version
 

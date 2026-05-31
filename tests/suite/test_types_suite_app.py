@@ -37,7 +37,7 @@ def test_suite_app_roundtrip_json():
         default_port=8001,
         icon="labeler",
         description="Labels OCR output",
-        binary_name="pd-ocr-labeler",
+        binary_name="pdomain-ocr-labeler",
     )
     roundtripped = SuiteApp.model_validate(app.model_dump())
     assert roundtripped == app

@@ -63,7 +63,7 @@ def register_default_stages(dispatcher: LocalStageDispatcher) -> None:
       is selected at call time via ``kwargs["engine"]``
       (``"doctr"`` or ``"tesseract"``; defaults to ``"doctr"``).
     * ``("ocr", "local")`` — DocTR runner using finetuned weights from
-      HF (``CT2534/pd-ocr-models``) on the autoselected torch device
+      HF (``pdomain/pdomain-ocr-models``) on the autoselected torch device
       (CUDA > MPS > CPU).  Falls through to the cpu impl on network /
       HF errors.
     * ``("ocr", "mps")`` — same impl as ``("ocr", "local")``; the
@@ -138,11 +138,11 @@ def _make_doctr_sync(*, image_path: str, page_id: str) -> Any:
 
 
 async def _ocr_local_impl(page_id: str, device: str, **kwargs: Any) -> dict[str, Any]:
-    """GPU/finetuned OCR stage — DocTR with CT2534 finetuned weights.
+    """GPU/finetuned OCR stage — DocTR with pdomain finetuned weights.
 
     Resolves the finetuned detection + recognition ``.pt`` files via
     :func:`pdomain_book_tools.hf.resolve_ocr_models` (defaults pull from
-    ``CT2534/pd-ocr-models``), builds the predictor on the autoselected
+    ``pdomain/pdomain-ocr-models``), builds the predictor on the autoselected
     torch device, and passes it to
     :meth:`pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr`.
 

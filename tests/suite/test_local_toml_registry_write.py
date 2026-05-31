@@ -26,18 +26,18 @@ def _make_app(app_id: str, version: str = "1.0.0") -> InstalledApp:
 def test_register_writes_new_entry(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
-    app = _make_app("pd-test-app")
+    app = _make_app("pdomain-test-app")
     registry.register(app)
     apps = registry.list_installed()
     assert len(apps) == 1
-    assert apps[0].app_id == "pd-test-app"
+    assert apps[0].app_id == "pdomain-test-app"
 
 
 def test_register_refreshes_existing_entry(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
-    registry.register(_make_app("pd-test-app", "1.0.0"))
-    registry.register(_make_app("pd-test-app", "2.0.0"))
+    registry.register(_make_app("pdomain-test-app", "1.0.0"))
+    registry.register(_make_app("pdomain-test-app", "2.0.0"))
     apps = registry.list_installed()
     assert len(apps) == 1
     assert apps[0].version == "2.0.0"
@@ -46,19 +46,19 @@ def test_register_refreshes_existing_entry(tmp_path):
 def test_register_preserves_other_apps(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
-    registry.register(_make_app("pd-app-a"))
-    registry.register(_make_app("pd-app-b"))
+    registry.register(_make_app("pdomain-app-a"))
+    registry.register(_make_app("pdomain-app-b"))
     apps = registry.list_installed()
     app_ids = {a.app_id for a in apps}
-    assert "pd-app-a" in app_ids
-    assert "pd-app-b" in app_ids
+    assert "pdomain-app-a" in app_ids
+    assert "pdomain-app-b" in app_ids
 
 
 def test_unregister_removes_block(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
-    registry.register(_make_app("pd-test-app"))
-    registry.unregister("pd-test-app")
+    registry.register(_make_app("pdomain-test-app"))
+    registry.unregister("pdomain-test-app")
     apps = registry.list_installed()
     assert apps == []
 
@@ -73,7 +73,7 @@ def test_unregister_missing_app_is_noop(tmp_path):
 def test_write_uses_filelock(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
-    app = _make_app("pd-test-app")
+    app = _make_app("pdomain-test-app")
 
     lock_entered = []
     original_enter = filelock.FileLock.__enter__
@@ -92,8 +92,8 @@ def test_concurrent_registers_serialize(tmp_path):
     toml_file = tmp_path / "installed.toml"
     registry = LocalTomlSuiteRegistry(root=toml_file)
 
-    app_a = _make_app("pd-app-a")
-    app_b = _make_app("pd-app-b")
+    app_a = _make_app("pdomain-app-a")
+    app_b = _make_app("pdomain-app-b")
 
     errors = []
 
@@ -119,5 +119,5 @@ def test_concurrent_registers_serialize(tmp_path):
     assert not errors
     apps = registry.list_installed()
     app_ids = {a.app_id for a in apps}
-    assert "pd-app-a" in app_ids
-    assert "pd-app-b" in app_ids
+    assert "pdomain-app-a" in app_ids
+    assert "pdomain-app-b" in app_ids

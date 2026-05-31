@@ -1,21 +1,21 @@
 # CLAUDE — pdomain-ops
 
-Python ops library for the `pd-*` suite: suite plumbing (registry, prefs,
+Python ops library for the `pdomain-*` suite: suite plumbing (registry, prefs,
 sibling-spawn, desktop), GPU dispatch (StageDispatcher / LongJobRunner),
-and schemas.emit. Imported by every `pd-*` SPA backend.
+and schemas.emit. Imported by every `pdomain-*` SPA backend.
 
 ## Commands
 
 | target | does |
 |---|---|
-| `make local-setup` | clone any missing sibling pd-* repos into the workspace |
+| `make local-setup` | clone any missing sibling pdomain-* repos into the workspace |
 | `make local-dev` | switch to local-dev mode (editable `../pdomain-book-tools` + marker) |
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editable siblings (local-mode only) |
-| `make update-pd-deps` | bump pd-* sibling deps to registry latest; leaves diff for review |
+| `make update-pdomain-deps` | bump pdomain-* sibling deps to registry latest; leaves diff for review |
 
 See [workspace `docs/process/local-dev.md`](../docs/process/local-dev.md) for the canonical local-dev pattern (spec #362).
-See [workspace `docs/process/update-pd-deps.md`](../docs/process/update-pd-deps.md) for the sibling-dep refresh pattern (spec #363).
+See [workspace `docs/process/update-pdomain-deps.md`](../docs/process/update-pdomain-deps.md) for the sibling-dep refresh pattern (spec #363).
 
 ## docs/ folder
 

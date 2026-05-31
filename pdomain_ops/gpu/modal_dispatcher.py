@@ -1,6 +1,6 @@
 """Modal GPUBackend — dispatches GPU work to a Modal Function.
 
-This is the canonical home for Modal-based GPU dispatch in the pd-* suite.
+This is the canonical home for Modal-based GPU dispatch in the pdomain-* suite.
 Deploy the companion app with::
 
     modal deploy src/pdomain_ops/gpu/modal_app.py

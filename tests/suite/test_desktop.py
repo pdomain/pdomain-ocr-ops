@@ -12,13 +12,13 @@ _NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 def _make_installed() -> InstalledApp:
     return InstalledApp(
-        app_id="pd-app-a",
-        package="pd_app_a",
+        app_id="pdomain-app-a",
+        package="pdomain_app_a",
         version="1.0.0",
         binary="/usr/bin/python3",
         default_port=8001,
         icon="test",
-        display_name="pd-app-a",
+        display_name="pdomain-app-a",
         registered_at=_NOW,
     )
 
@@ -39,7 +39,7 @@ def test_install_shortcut_raises_not_implemented_on_platform(platform):
 @pytest.mark.parametrize("platform", ["linux", "darwin", "win32"])
 def test_remove_shortcut_raises_not_implemented_on_each_platform(platform):
     with patch.object(sys, "platform", platform), pytest.raises(NotImplementedError):
-        remove_shortcut("pd-app-a")
+        remove_shortcut("pdomain-app-a")
 
 
 def test_install_shortcut_signature_accepts_installed_app():

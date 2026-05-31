@@ -11,7 +11,7 @@ def _make_app(**kwargs):
         "app_id": "pdomain-ocr-labeler-spa",
         "package": "pdomain_ocr_labeler_spa",
         "version": "0.4.2",
-        "binary": "/usr/local/bin/pd-ocr-labeler",
+        "binary": "/usr/local/bin/pdomain-ocr-labeler",
         "default_port": 8001,
         "icon": "labeler",
         "display_name": "OCR Labeler",

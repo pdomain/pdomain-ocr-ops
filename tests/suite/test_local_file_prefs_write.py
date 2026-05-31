@@ -34,31 +34,31 @@ def test_write_common_preserves_apps_section(tmp_path):
     prefs_file = tmp_path / "ui-prefs.json"
     writer = LocalFilePrefs(root=prefs_file)
     # Pre-populate with apps data
-    writer.write_app("pd-app-a", {"setting": "value"})
+    writer.write_app("pdomain-app-a", {"setting": "value"})
     # Now write common
     writer.write_common(_make_common(theme="light"))
     data = json.loads(prefs_file.read_text())
-    assert data["apps"]["pd-app-a"]["setting"] == "value"
+    assert data["apps"]["pdomain-app-a"]["setting"] == "value"
     assert data["common"]["theme"] == "light"
 
 
 def test_write_app_creates_apps_section_if_missing(tmp_path):
     prefs_file = tmp_path / "ui-prefs.json"
     writer = LocalFilePrefs(root=prefs_file)
-    writer.write_app("pd-test-app", {"key": "val"})
+    writer.write_app("pdomain-test-app", {"key": "val"})
     data = json.loads(prefs_file.read_text())
-    assert data["apps"]["pd-test-app"]["key"] == "val"
+    assert data["apps"]["pdomain-test-app"]["key"] == "val"
 
 
 def test_write_app_replaces_only_that_app(tmp_path):
     prefs_file = tmp_path / "ui-prefs.json"
     writer = LocalFilePrefs(root=prefs_file)
-    writer.write_app("pd-app-a", {"a_key": "a_val"})
-    writer.write_app("pd-app-b", {"b_key": "b_val"})
-    writer.write_app("pd-app-a", {"a_key": "updated"})
+    writer.write_app("pdomain-app-a", {"a_key": "a_val"})
+    writer.write_app("pdomain-app-b", {"b_key": "b_val"})
+    writer.write_app("pdomain-app-a", {"a_key": "updated"})
     data = json.loads(prefs_file.read_text())
-    assert data["apps"]["pd-app-a"]["a_key"] == "updated"
-    assert data["apps"]["pd-app-b"]["b_key"] == "b_val"
+    assert data["apps"]["pdomain-app-a"]["a_key"] == "updated"
+    assert data["apps"]["pdomain-app-b"]["b_key"] == "b_val"
 
 
 def test_write_uses_filelock(tmp_path):

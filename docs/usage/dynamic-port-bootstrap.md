@@ -2,7 +2,7 @@
 
 ## Problem
 
-pd-* SPAs default to a fixed port (e.g. simple-gui = 8004). When
+pdomain-* SPAs default to a fixed port (e.g. simple-gui = 8004). When
 something else on the machine already binds that port the app crashes on
 startup with `OSError: [Errno 98] Address already in use`. Hardcoding a
 fallback port just shifts the collision risk to the fallback.

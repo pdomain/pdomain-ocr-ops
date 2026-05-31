@@ -94,7 +94,7 @@ def _make_adapters(apps=None):
 
 
 def test_get_installed_returns_registry_list():
-    apps = [_make_installed("pd-app-a"), _make_installed("pd-app-b")]
+    apps = [_make_installed("pdomain-app-a"), _make_installed("pdomain-app-b")]
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters(apps))
     client = TestClient(app)
@@ -105,7 +105,7 @@ def test_get_installed_returns_registry_list():
 
 
 def test_get_installed_serializes_full_shape():
-    apps = [_make_installed("pd-app-a")]
+    apps = [_make_installed("pdomain-app-a")]
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters(apps))
     client = TestClient(app)

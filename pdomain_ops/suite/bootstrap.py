@@ -1,6 +1,6 @@
 """bootstrap_spa() — high-level SPA startup helper.
 
-Every pd-* SPA can collapse its entry-point boilerplate to::
+Every pdomain-* SPA can collapse its entry-point boilerplate to::
 
     from pdomain_ops.suite import bootstrap_spa
 

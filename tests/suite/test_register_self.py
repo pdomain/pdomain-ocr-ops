@@ -70,7 +70,7 @@ def test_register_self_reads_fragment_from_caller_package(tmp_path, monkeypatch)
     """register_self() reads pdomain-suite.json from the calling package."""
     pkg_name = "fake_suite_app_reads"
     fragment = {
-        "app_id": "pd-fake-app",
+        "app_id": "pdomain-fake-app",
         "display_name": "Fake App",
         "package": pkg_name,
         "default_port": 8042,
@@ -89,14 +89,14 @@ def test_register_self_reads_fragment_from_caller_package(tmp_path, monkeypatch)
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    assert any(a.app_id == "pd-fake-app" for a in apps)
+    assert any(a.app_id == "pdomain-fake-app" for a in apps)
 
 
 def test_register_self_fills_binary_from_argv(tmp_path, monkeypatch):
     """register_self() sets binary from sys.argv[0] (resolved)."""
     pkg_name = "fake_suite_app_argv"
     fragment = {
-        "app_id": "pd-argv-app",
+        "app_id": "pdomain-argv-app",
         "display_name": "Argv App",
         "package": pkg_name,
         "default_port": 8043,
@@ -115,7 +115,7 @@ def test_register_self_fills_binary_from_argv(tmp_path, monkeypatch):
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-argv-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-argv-app"]
     assert matching, "app not registered"
     # binary is stored as the resolved absolute path (follows symlinks)
     expected = str(Path(argv_path).resolve())
@@ -126,7 +126,7 @@ def test_register_self_fills_version_from_importlib_metadata(tmp_path, monkeypat
     """register_self() reads version from importlib.metadata."""
     pkg_name = "fake_suite_app_version"
     fragment = {
-        "app_id": "pd-version-app",
+        "app_id": "pdomain-version-app",
         "display_name": "Version App",
         "package": pkg_name,
         "default_port": 8044,
@@ -144,7 +144,7 @@ def test_register_self_fills_version_from_importlib_metadata(tmp_path, monkeypat
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-version-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-version-app"]
     assert matching, "app not registered"
     assert matching[0].version == "3.4.5"
 
@@ -153,7 +153,7 @@ def test_register_self_kwargs_override_fragment(tmp_path, monkeypatch):
     """register_self(**overrides) merges overrides onto auto-detected fields."""
     pkg_name = "fake_suite_app_override"
     fragment = {
-        "app_id": "pd-override-app",
+        "app_id": "pdomain-override-app",
         "display_name": "Override App",
         "package": pkg_name,
         "default_port": 8000,
@@ -175,7 +175,7 @@ def test_register_self_kwargs_override_fragment(tmp_path, monkeypatch):
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-override-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-override-app"]
     assert matching, "app not registered"
     assert matching[0].default_port == 9999
 
@@ -213,7 +213,7 @@ def test_register_self_fragment_with_description(tmp_path, monkeypatch):
     """register_self() succeeds when pdomain-suite.json includes a description field."""
     pkg_name = "fake_suite_app_description"
     fragment = {
-        "app_id": "pd-desc-app",
+        "app_id": "pdomain-desc-app",
         "display_name": "Description App",
         "package": pkg_name,
         "default_port": 8050,
@@ -233,7 +233,7 @@ def test_register_self_fragment_with_description(tmp_path, monkeypatch):
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-desc-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-desc-app"]
     assert matching, "app not registered"
     assert matching[0].description == "A human-readable description of this app"
 
@@ -247,7 +247,7 @@ def test_register_self_actual_port_none_leaves_fragment_port(tmp_path, monkeypat
     """actual_port=None leaves the fragment's default_port unchanged."""
     pkg_name = "fake_suite_app_port_none"
     fragment = {
-        "app_id": "pd-port-none-app",
+        "app_id": "pdomain-port-none-app",
         "display_name": "Port None App",
         "package": pkg_name,
         "default_port": 8100,
@@ -269,7 +269,7 @@ def test_register_self_actual_port_none_leaves_fragment_port(tmp_path, monkeypat
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-port-none-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-port-none-app"]
     assert matching, "app not registered"
     assert matching[0].default_port == 8100
 
@@ -278,7 +278,7 @@ def test_register_self_actual_port_overrides_fragment_port(tmp_path, monkeypatch
     """actual_port=8005 overrides the fragment's default_port in the registry row."""
     pkg_name = "fake_suite_app_port_override"
     fragment = {
-        "app_id": "pd-port-override-app",
+        "app_id": "pdomain-port-override-app",
         "display_name": "Port Override App",
         "package": pkg_name,
         "default_port": 8200,
@@ -300,7 +300,7 @@ def test_register_self_actual_port_overrides_fragment_port(tmp_path, monkeypatch
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-port-override-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-port-override-app"]
     assert matching, "app not registered"
     assert matching[0].default_port == 8005
 
@@ -309,7 +309,7 @@ def test_register_self_actual_port_not_appended(tmp_path, monkeypatch):
     """actual_port overrides default_port; it is not added as an extra field."""
     pkg_name = "fake_suite_app_port_no_append"
     fragment = {
-        "app_id": "pd-port-no-append-app",
+        "app_id": "pdomain-port-no-append-app",
         "display_name": "Port No-Append App",
         "package": pkg_name,
         "default_port": 8300,
@@ -333,7 +333,7 @@ def test_register_self_actual_port_not_appended(tmp_path, monkeypatch):
 
     registry = LocalTomlSuiteRegistry(root=toml_file)
     apps = registry.list_installed()
-    matching = [a for a in apps if a.app_id == "pd-port-no-append-app"]
+    matching = [a for a in apps if a.app_id == "pdomain-port-no-append-app"]
     assert matching, "app not registered"
     # Only one port field: default_port should be 9001
     assert matching[0].default_port == 9001

@@ -27,7 +27,7 @@ _PLATFORM_MESSAGES = {
 def install_shortcut(app: InstalledApp) -> None:
     """TODO Phase 4: write .desktop (Linux) / .app (macOS) / .lnk (Windows).
 
-    For Phase 1 this is a stub — each pd-* app's CLI flag exists so the
+    For Phase 1 this is a stub — each pdomain-* app's CLI flag exists so the
     surface is wired when the platform code lands.
     """
     plat = sys.platform

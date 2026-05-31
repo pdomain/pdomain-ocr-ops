@@ -70,7 +70,9 @@ class _FakeStorage:
         return []
 
 
-def _make_installed_with_icon(tmp_path, app_id: str = "pd-app-a", size: int = 128) -> InstalledApp:
+def _make_installed_with_icon(
+    tmp_path, app_id: str = "pdomain-app-a", size: int = 128
+) -> InstalledApp:
     """Create a fake installed app with a real icon file."""
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir(exist_ok=True)
@@ -104,34 +106,34 @@ def _make_adapters(apps=None):
 
 
 def test_get_icon_returns_png_for_known_app(tmp_path):
-    installed = _make_installed_with_icon(tmp_path, "pd-app-a", 128)
+    installed = _make_installed_with_icon(tmp_path, "pdomain-app-a", 128)
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed]))
     client = TestClient(app)
-    resp = client.get("/api/icons/128?app_id=pd-app-a")
+    resp = client.get("/api/icons/128?app_id=pdomain-app-a")
     assert resp.status_code == 200
     assert "image/png" in resp.headers["content-type"]
 
 
 def test_get_icon_missing_returns_404(tmp_path):
     # App without icon dir
-    binary = tmp_path / "bin" / "pd-app-a"
+    binary = tmp_path / "bin" / "pdomain-app-a"
     binary.parent.mkdir(parents=True)
     binary.write_bytes(b"#!/bin/sh\n")
     installed = InstalledApp(
-        app_id="pd-app-a",
-        package="pd_app_a",
+        app_id="pdomain-app-a",
+        package="pdomain_app_a",
         version="1.0.0",
         binary=str(binary),
         default_port=8001,
         icon="test",
-        display_name="pd-app-a",
+        display_name="pdomain-app-a",
         registered_at=_NOW,
     )
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed]))
     client = TestClient(app)
-    resp = client.get("/api/icons/128?app_id=pd-app-a")
+    resp = client.get("/api/icons/128?app_id=pdomain-app-a")
     assert resp.status_code == 404
 
 
@@ -140,5 +142,5 @@ def test_get_icon_unsupported_size_returns_400(tmp_path):
     app = FastAPI()
     mount_routes(app, adapters=_make_adapters([installed]))
     client = TestClient(app)
-    resp = client.get("/api/icons/999?app_id=pd-app-a")
+    resp = client.get("/api/icons/999?app_id=pdomain-app-a")
     assert resp.status_code == 400

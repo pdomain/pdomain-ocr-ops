@@ -1,7 +1,7 @@
 """Shared-GPU-container GPUBackend — HTTP client stub.
 
 This is the canonical home for shared-container-based GPU dispatch in the
-pd-* suite. All methods raise ``NotImplementedError`` until the HTTP client
+pdomain-* suite. All methods raise ``NotImplementedError`` until the HTTP client
 is wired in a follow-up plan.
 
 Cherry-picked-from: pdomain-prep-for-pgdp@e36c199df466ff45b70d2a452dd7512dcc2a17c9

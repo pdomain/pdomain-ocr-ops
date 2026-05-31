@@ -1,9 +1,9 @@
 # pdomain-ops
 
 Library + tiny CLI providing suite plumbing, shared prefs, and GPU dispatch adapters
-for the pd-* suite.
+for the pdomain-* suite.
 
-`pdomain-ops` is a library (not a daemon) that runs in-process inside each pd-* app's
+`pdomain-ops` is a library (not a daemon) that runs in-process inside each pdomain-* app's
 FastAPI server. It provides:
 
 - **Suite registry** (`installed.toml`): apps self-register so the AppShell launcher
