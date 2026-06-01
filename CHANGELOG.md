@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.0] - 2026-06-01
+
+### Added
+
+- `PageRecord.extensions` — namespaced `dict[str, dict[str, Any]]` field for
+  app-specific JSON-able state (e.g. `extensions["labeler"]`, `extensions["prep"]`).
+  Serializes through the existing `_PageRecordTranscoding` with no new transcoding
+  required (design: page-server v2 §1).
+- `pdomain_ops.pages.extensions` — `get_extension` / `set_extension` typed helpers
+  for validated access to `PageRecord.extensions` namespaces; re-exported from
+  `pdomain_ops.pages` and top-level `pdomain_ops`.
+- `pdomain_ops.page_server` — shard/distribute-ready server model:
+  `BlobBackend`, `PageStore`, `ShardRouter` `runtime_checkable` Protocols;
+  `LocalPageStore` (single-process, `PagesApplication`-backed);
+  `SingleShard` (trivial all-local `ShardRouter`);
+  `ShardedPageStore` (project-routed composition over a shard map);
+  `RemotePageStore` (stub — raises `NotImplementedError` until transport ships).
+  Not re-exported at top level — lifecycle consumers only.
+- `ProjectAggregate.remove_page(page_id)` — `@event("PageRemoved")` that removes a
+  page from the project's ordered list; no-op if absent.
+
 ## [0.6.0] - 2026-06-01
 
 ### Added
