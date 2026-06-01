@@ -11,3 +11,28 @@ def test_top_level_exports_present():
     assert StageDispatcher is not None
     assert LongJobRunner is not None
     assert pick_device is not None
+
+
+def test_universal_pages_surface_is_top_level_importable() -> None:
+    from pdomain_ops import (
+        PageChangeEntry,
+        PagePayload,
+        PageRecord,
+        ProjectRecord,
+        ProvenanceGraph,
+        ProvenanceNode,
+        RotationSource,
+        build_provenance_summary,
+    )
+
+    assert PageRecord.__name__ == "PageRecord"
+    assert RotationSource.AUTO == "auto"
+    assert callable(build_provenance_summary)
+    _ = (PageChangeEntry, PagePayload, ProjectRecord, ProvenanceGraph, ProvenanceNode)
+
+
+def test_lifecycle_modules_are_not_top_level_exports() -> None:
+    import pdomain_ops
+
+    assert "BlobStore" not in pdomain_ops.__all__
+    assert "PageAggregate" not in pdomain_ops.__all__
