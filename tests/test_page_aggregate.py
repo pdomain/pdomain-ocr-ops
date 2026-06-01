@@ -83,6 +83,23 @@ def test_snapshotting_truncates_replay(tmp_path: Path) -> None:
     assert app.repository.get(pid).record.provenance is not None
 
 
+def test_ocr_completed_blob_refs_reach_node_from_kwarg_only(tmp_path: Path) -> None:
+    """blob_refs passed ONLY to the kwarg (not on the node) must still be retrievable
+    from the reloaded aggregate's current state — design spec §8 contract."""
+    app = PagesApplication(env=_sqlite_env(tmp_path))
+    pid = uuid4()
+    agg = PageAggregate(record=PageRecord(page_id=pid, page_index=0))
+    agg.ocr_completed(
+        provenance_node=ProvenanceNode(id="ocr", source="ocr"),  # NOTE: no blob_refs on node
+        blob_refs=["content_hash", "image_hash"],
+    )
+    app.save(agg)
+    reloaded: PageAggregate = app.repository.get(pid)
+    assert reloaded.record.provenance is not None
+    assert reloaded.record.provenance.head is not None
+    assert reloaded.record.provenance.head.blob_refs == ["content_hash", "image_hash"]
+
+
 def test_project_aggregate_round_trips(tmp_path: Path) -> None:
     app = PagesApplication(env=_sqlite_env(tmp_path))
     proj_id = uuid4()

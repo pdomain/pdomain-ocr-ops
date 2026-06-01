@@ -17,6 +17,20 @@ aggregate diverge from the in-memory one. This is standard event-sourcing
 discipline: events own their data. The aggregate's *own* state is already
 isolated (``__init__`` deep-copies ``record``; ``PageChangeEntry`` copies
 ``changes`` on construction), so normal "build args → fire → save" usage is safe.
+
+``ocr_completed`` and ``preprocess`` backfill behaviour
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Both commands accept a ``blob_refs`` kwarg alongside ``provenance_node``.
+Per design spec §8, ``blob_refs`` is the canonical location for
+``[page_content_hash, source_image_hash, ...]``. When the caller supplies
+``blob_refs`` but omits them from the node itself, both commands backfill the
+node's ``blob_refs`` from the kwarg via ``_with_blob_refs`` (non-mutating
+``model_copy``) before storing the node in the provenance graph. This means
+either location works: a node that already carries ``blob_refs`` wins (existing
+callers are unaffected), while a node with empty ``blob_refs`` inherits them
+from the kwarg. Because the event stores both ``provenance_node`` *and*
+``blob_refs`` as separate fields, the merge recomputes identically on replay —
+replay determinism is preserved.
 """
 
 from __future__ import annotations
@@ -30,6 +44,18 @@ from eventsourcing.persistence import Transcoding
 
 from pdomain_ops.pages import PageChangeEntry, PageRecord, ProjectRecord, ProvenanceNode
 from pdomain_ops.pages.provenance import ProvenanceGraph
+
+
+def _with_blob_refs(node: ProvenanceNode, blob_refs: list[str]) -> ProvenanceNode:
+    """Return a node carrying blob_refs: the node's own if present, else the event's.
+
+    Non-mutating (``model_copy``) so the stored event's node is never aliased.
+    Replay-deterministic: the event stores both ``provenance_node`` and ``blob_refs``
+    as separate fields, so this merge recomputes the same result on every replay.
+    """
+    if node.blob_refs:
+        return node
+    return node.model_copy(update={"blob_refs": list(blob_refs)})
 
 
 class PageAggregate(Aggregate):
@@ -59,15 +85,13 @@ class PageAggregate(Aggregate):
     @event("ImagePreprocessed")
     def preprocess(self, provenance_node: ProvenanceNode, blob_refs: list[str]) -> None:
         """Record image preprocessing and its provenance."""
-        del blob_refs
-        self._apply_node(provenance_node)
+        self._apply_node(_with_blob_refs(provenance_node, blob_refs))
 
     @event("OcrCompleted")
     def ocr_completed(self, provenance_node: ProvenanceNode, blob_refs: list[str]) -> None:
-        """Record OCR completion, clear the failure flag, and update provenance."""
-        del blob_refs
+        """Record completed OCR: clear the failure flag and add the OCR provenance node."""
         self._record.ocr_failed = False
-        self._apply_node(provenance_node)
+        self._apply_node(_with_blob_refs(provenance_node, blob_refs))
 
     @event("GtMapped")
     def gt_mapped(self, provenance_node: ProvenanceNode) -> None:
