@@ -13,10 +13,11 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
 dependencies = [
+    "eventsourcing>=9.4,<10",
     "fastapi>=0.110",
     "filelock>=3.13",
     "httpx>=0.27",
-    "pdomain-book-tools>=0.15.1",
+    "pdomain-book-tools>=0.17.0",
     "platformdirs>=4.2",
     "pydantic>=2.5",
     "tomli>=2.0",
@@ -49,7 +50,13 @@ explicit = true
 required-version = ">=0.11.16"
 
 [tool.uv.sources]
-pdomain-book-tools = { index = "pdomain-index-pip" }
+# TEMPORARY (release-gate): pdomain-book-tools 0.17.x is tagged but not yet
+# published to pdomain-index-pip (index tops out at 0.16.0), so the >=0.17.0
+# floor only resolves via the editable sibling. Absolute path so it survives
+# ff-merge from the worktree into the canonical checkout.
+# REVERT to `{ index = "pdomain-index-pip" }` and re-run `uv lock` once
+# pdomain-book-tools 0.17.x is published — this MUST happen before release.
+pdomain-book-tools = { path = "/workspaces/ocr-container/pdomain-book-tools", editable = true }
 
 [dependency-groups]
 dev = [

@@ -125,7 +125,7 @@ def _make_doctr_sync(*, image_path: str, page_id: str) -> Any:
             Document,
         )
 
-        doc = Document.from_image_ocr_via_doctr(
+        doc, _rotation = Document.from_image_ocr_via_doctr(
             image=image_path,
             source_identifier=page_id,
         )
@@ -220,7 +220,7 @@ def _make_doctr_finetuned_sync(
             predictor = get_finetuned_torch_doctr_predictor(det_path, reco_path)
             _predictor_cache[cache_key] = predictor
 
-        doc = Document.from_image_ocr_via_doctr(
+        doc, _rotation = Document.from_image_ocr_via_doctr(
             image=image_path,
             source_identifier=page_id,
             predictor=predictor,

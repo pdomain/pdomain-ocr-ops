@@ -37,7 +37,7 @@ async def test_doctr_stage_calls_ocr_via_run_in_executor(monkeypatch: pytest.Mon
 
     with patch(
         "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
-        return_value=fake_doc,
+        return_value=(fake_doc, 0),
     ) as mock_doctr:
         dispatcher = LocalStageDispatcher()
         register_default_stages(dispatcher)
@@ -121,11 +121,11 @@ async def test_ocr_local_uses_finetuned_predictor(monkeypatch: pytest.MonkeyPatc
         source_identifier: str = "",
         predictor: object = None,
         **_: object,
-    ) -> MagicMock:
+    ) -> tuple[MagicMock, int]:
         captured["image"] = image
         captured["source_identifier"] = source_identifier
         captured["predictor"] = predictor
-        return fake_doc
+        return (fake_doc, 0)
 
     monkeypatch.setattr(
         _doc_mod.Document,
@@ -181,7 +181,7 @@ async def test_ocr_local_falls_back_when_resolve_fails(
     with caplog.at_level(logging.WARNING, logger="pdomain_ops.gpu.default_stages"):
         with patch(
             "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
-            return_value=fake_doc,
+            return_value=(fake_doc, 0),
         ) as mock_doctr:
             dispatcher = LocalStageDispatcher()
             register_default_stages(dispatcher)
@@ -234,7 +234,7 @@ async def test_ocr_local_predictor_cache_reuses_predictor(
 
     with patch(
         "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
-        return_value=fake_doc,
+        return_value=(fake_doc, 0),
     ):
         dispatcher = LocalStageDispatcher()
         register_default_stages(dispatcher)
@@ -256,7 +256,7 @@ async def test_default_engine_is_doctr(monkeypatch: pytest.MonkeyPatch) -> None:
 
     with patch(
         "pdomain_book_tools.ocr.document.Document.from_image_ocr_via_doctr",
-        return_value=fake_doc,
+        return_value=(fake_doc, 0),
     ) as mock_doctr:
         dispatcher = LocalStageDispatcher()
         register_default_stages(dispatcher)
