@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.7.1] - 2026-06-01
+
+### Added
+
+- `PageAggregate.set_extension(namespace, value)` -- event-backed extension
+  mutation. Dumps `value` (a `pydantic.BaseModel`) to a JSON-able dict and
+  records an `ExtensionSet` event, so the mutation is captured in the event
+  store and survives replay and snapshotting.
+- `PageAggregate._record_extension(namespace, data)` -- the `@event("ExtensionSet")`
+  command method that applies the deep-copied dict to `record.extensions[namespace]`.
+
+### Fixed
+
+- Extension updates on an already-persisted `PageAggregate` were silently lost
+  on reload: mutating `record.extensions` directly does not produce an event,
+  so replay rebuilds the aggregate without the mutation. Post-persist extension
+  changes must now go through `PageAggregate.set_extension`, which records the
+  `ExtensionSet` event. Pre-persist construction via the free
+  `set_extension(record, ns, value)` helper in `pdomain_ops.pages.extensions`
+  is unaffected.
+
+### Notes
+
+- `ProjectRecord` has no `extensions` field; `ProjectAggregate` does not gain
+  a `set_extension` command.
+- The free `get_extension` / `set_extension` helpers in
+  `pdomain_ops.pages.extensions` are unchanged; they remain the correct tools
+  for pre-persist record construction.
+
 ## [0.7.0] - 2026-06-01
 
 ### Added
