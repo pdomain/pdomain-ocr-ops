@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID  # noqa: TC003
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from pdomain_ops.pages.records import PageRecord  # noqa: TC001
 
@@ -25,3 +25,12 @@ class PagePayload(BaseModel):
     content: dict[str, Any]
     image_url: str | None = None
     dims: tuple[int, int] | None = None
+
+    @model_validator(mode="after")
+    def _check_identity(self) -> PagePayload:
+        if self.page_id != self.record.page_id:
+            raise ValueError(
+                f"PagePayload.page_id ({self.page_id}) must equal "
+                f"record.page_id ({self.record.page_id})"
+            )
+        return self

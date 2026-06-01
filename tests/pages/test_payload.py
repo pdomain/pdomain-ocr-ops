@@ -1,5 +1,8 @@
 from uuid import uuid4
 
+import pytest
+from pydantic import ValidationError
+
 from pdomain_ops.pages.payload import PagePayload
 from pdomain_ops.pages.provenance import ProvenanceGraph, ProvenanceNode
 from pdomain_ops.pages.records import PageRecord
@@ -35,3 +38,14 @@ def test_payload_page_id_matches_record() -> None:
         content={},
     )
     assert payload.page_id == payload.record.page_id
+
+
+def test_payload_rejects_page_id_mismatch() -> None:
+    a, b = uuid4(), uuid4()
+    with pytest.raises(ValidationError):
+        PagePayload(
+            page_id=a,
+            page_index=0,
+            record=PageRecord(page_id=b, page_index=0),  # different page_id
+            content={},
+        )
