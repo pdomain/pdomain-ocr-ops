@@ -28,3 +28,12 @@ def test_summary_skips_unknown_head_history_ids() -> None:
     graph.add_node(ProvenanceNode(id="o", source="ocr", tool="doctr"))
     graph.history.append("ghost")
     assert build_provenance_summary(graph) == "ocr(doctr)"
+
+
+def test_summary_falls_back_to_head_when_history_empty() -> None:
+    """Graph with a node and head_id set but history == [] falls back to the head."""
+    node = ProvenanceNode(id="n", source="ocr", tool="doctr")
+    graph = ProvenanceGraph(nodes={"n": node}, head_id="n")
+    # bypass add_node so history stays empty
+    assert graph.history == []
+    assert build_provenance_summary(graph) == "ocr(doctr)"

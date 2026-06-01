@@ -100,6 +100,24 @@ def test_ocr_completed_blob_refs_reach_node_from_kwarg_only(tmp_path: Path) -> N
     assert reloaded.record.provenance.head.blob_refs == ["content_hash", "image_hash"]
 
 
+def test_gt_mapped_advances_provenance_head(tmp_path: Path) -> None:
+    """gt_mapped fires after ocr_completed and advances the provenance head to 'gt'."""
+    app = PagesApplication(env=_sqlite_env(tmp_path))
+    pid = uuid4()
+    agg = PageAggregate(record=PageRecord(page_id=pid, page_index=0))
+    agg.ocr_completed(
+        provenance_node=ProvenanceNode(id="ocr", source="ocr", tool="doctr"),
+        blob_refs=["content_hash"],
+    )
+    agg.gt_mapped(provenance_node=ProvenanceNode(id="gt", source="gt"))
+    app.save(agg)
+
+    reloaded: PageAggregate = app.repository.get(pid)
+    assert reloaded.record.provenance is not None
+    assert reloaded.record.provenance.head_id == "gt"
+    assert "gt" in reloaded.record.provenance.nodes
+
+
 def test_project_aggregate_round_trips(tmp_path: Path) -> None:
     app = PagesApplication(env=_sqlite_env(tmp_path))
     proj_id = uuid4()
@@ -107,6 +125,21 @@ def test_project_aggregate_round_trips(tmp_path: Path) -> None:
     proj = ProjectAggregate(record=ProjectRecord(project_id=proj_id, name="Book"))
     proj.add_page(page_id=p0, page_index=0)
     proj.add_page(page_id=p1, page_index=1)
+    app.save(proj)
+
+    reloaded: ProjectAggregate = app.repository.get(proj_id)
+    assert reloaded.record.page_ids == [p0, p1]
+
+
+def test_project_exported_fires_and_persists(tmp_path: Path) -> None:
+    """exported() fires without error and the aggregate round-trips with page_ids intact."""
+    app = PagesApplication(env=_sqlite_env(tmp_path))
+    proj_id = uuid4()
+    p0, p1 = uuid4(), uuid4()
+    proj = ProjectAggregate(record=ProjectRecord(project_id=proj_id, name="Book"))
+    proj.add_page(page_id=p0, page_index=0)
+    proj.add_page(page_id=p1, page_index=1)
+    proj.exported(provenance_node=ProvenanceNode(id="export", source="export"))
     app.save(proj)
 
     reloaded: ProjectAggregate = app.repository.get(proj_id)
