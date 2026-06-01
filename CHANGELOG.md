@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.6.0] - 2026-06-01
+
+### Added
+
+- `pdomain_ops.pages` — universal page value models imported by every pd-*
+  page consumer: `PageRecord`, `ProjectRecord`,
+  `ProvenanceGraph`/`ProvenanceNode`/`DeadBranch`, `RotationSource`,
+  `PageChangeEntry`, `PagePayload`, and `build_provenance_summary`. These are
+  re-exported from the top-level `pdomain_ops` package.
+- `pdomain_ops.blob_store.BlobStore` — content-addressed SHA256 blob store
+  implementing `pdomain_book_tools.ocr.BlobStoreProtocol` (lifecycle consumers).
+- `pdomain_ops.page_aggregate` — `PageAggregate`, `ProjectAggregate`, and
+  `PagesApplication` (event sourcing; sqlite persistence + snapshotting). Not
+  re-exported at top level, so `import pdomain_ops` stays free of the
+  `eventsourcing` dependency.
+
+### Changed
+
+- Bumped the `pdomain-book-tools` floor to `>=0.17.0` (the Page
+  operational-field split). Adopted its new
+  `Document.from_image_ocr_via_doctr -> tuple[Document, int]` return shape.
+- Added the `eventsourcing>=9.4,<10` dependency.
+
 ## [0.3.1] - 2026-05-30
 
 ### Added
