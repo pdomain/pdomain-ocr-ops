@@ -144,6 +144,12 @@ class ProjectAggregate(Aggregate):
         """Replace the project's page ordering with the given sequence."""
         self._record.page_ids = list(page_ids)
 
+    @event("PageRemoved")
+    def remove_page(self, page_id: UUID) -> None:
+        """Remove a page from the project's ordered list (no-op if absent)."""
+        if page_id in self._record.page_ids:
+            self._record.page_ids.remove(page_id)
+
     @event("ProjectExported")
     def exported(self, provenance_node: ProvenanceNode) -> None:
         """Record that the project was exported."""

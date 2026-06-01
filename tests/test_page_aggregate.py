@@ -144,3 +144,36 @@ def test_project_exported_fires_and_persists(tmp_path: Path) -> None:
 
     reloaded: ProjectAggregate = app.repository.get(proj_id)
     assert reloaded.record.page_ids == [p0, p1]
+
+
+def test_remove_page_removes_and_persists(tmp_path: Path) -> None:
+    """remove_page removes the page_id and the aggregate round-trips correctly."""
+    app = PagesApplication(env=_sqlite_env(tmp_path))
+    proj_id = uuid4()
+    p0, p1 = uuid4(), uuid4()
+    proj = ProjectAggregate(record=ProjectRecord(project_id=proj_id, name="Book"))
+    proj.add_page(page_id=p0, page_index=0)
+    proj.add_page(page_id=p1, page_index=1)
+    proj.remove_page(page_id=p0)
+    app.save(proj)
+
+    reloaded: ProjectAggregate = app.repository.get(proj_id)
+    assert p0 not in reloaded.record.page_ids
+    assert p1 in reloaded.record.page_ids
+
+
+def test_remove_page_absent_is_noop(tmp_path: Path) -> None:
+    """remove_page on an absent page_id is a safe no-op."""
+    from uuid import uuid4 as _uuid4
+
+    app = PagesApplication(env=_sqlite_env(tmp_path))
+    proj_id = uuid4()
+    p0 = uuid4()
+    absent = _uuid4()
+    proj = ProjectAggregate(record=ProjectRecord(project_id=proj_id, name="Book"))
+    proj.add_page(page_id=p0, page_index=0)
+    proj.remove_page(page_id=absent)  # should not raise
+    app.save(proj)
+
+    reloaded: ProjectAggregate = app.repository.get(proj_id)
+    assert reloaded.record.page_ids == [p0]
