@@ -291,3 +291,58 @@ async def test_non_oom_runtime_error_reraises() -> None:
     ):
         with pytest.raises(RuntimeError, match="some other GPU error"):
             run_doctr_batch([img], predictor=stub_predictor, device="cpu")
+
+
+# ---------------------------------------------------------------------------
+# Book-tools 0.18.0 auto-rotation regression
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_batch_ocr_does_not_suppress_auto_rotate() -> None:
+    """run_doctr_batch must NOT pass auto_rotate=False to from_images_ocr_via_doctr.
+
+    book-tools 0.18.0 added auto_rotate=True as the default on the batch OCR
+    method so that rotated pages are corrected automatically.  This test
+    ensures the ops batch path never overrides that default to False, which
+    would silently re-introduce the rotated-page → empty OCR regression.
+    """
+    from pdomain_ops.gpu.doctr_batch import run_doctr_batch
+
+    img = np.zeros((100, 100, 3), dtype=np.uint8)
+
+    fake_page = MagicMock()
+    fake_page.to_dict.return_value = {"auto_rotate_regression": True}
+    fake_doc = MagicMock()
+    fake_doc.pages = [fake_page]
+
+    captured_kwargs: dict[str, Any] = {}
+
+    def _capture_kwargs(
+        cls: Any,
+        images: list[Any],
+        source_identifiers: list[str] | None = None,
+        predictor: Any = None,
+        **kw: Any,
+    ) -> MagicMock:
+        captured_kwargs.update(kw)
+        return fake_doc
+
+    stub_predictor = MagicMock()
+
+    import pdomain_book_tools.ocr.document as _doc_mod
+
+    with patch.object(
+        _doc_mod.Document,
+        "from_images_ocr_via_doctr",
+        classmethod(_capture_kwargs),
+    ):
+        result = run_doctr_batch([img], predictor=stub_predictor, device="cpu")
+
+    assert result == [fake_page]
+    # auto_rotate must NOT be explicitly set to False — either absent (uses
+    # the library default True) or explicitly True are both acceptable.
+    assert captured_kwargs.get("auto_rotate", True) is not False, (
+        "run_doctr_batch must not pass auto_rotate=False; "
+        "book-tools 0.18.0 default (True) must remain in effect"
+    )

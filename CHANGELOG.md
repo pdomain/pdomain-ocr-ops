@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Bump `pdomain-book-tools` floor to `>=0.18.0`. The batch OCR method
+  `Document.from_images_ocr_via_doctr` now defaults to `auto_rotate=True`, so
+  rotated pages are corrected automatically without any change in ops call-sites.
+  Adds a regression test asserting `run_doctr_batch` never suppresses auto-rotation
+  (i.e. never passes `auto_rotate=False`).
+
 ## [0.7.1] - 2026-06-01
 
 ### Added
