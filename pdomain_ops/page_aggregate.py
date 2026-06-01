@@ -12,11 +12,23 @@ Command-argument ownership contract
 event at call time. Callers MUST treat any argument passed to a command method
 (``provenance_node``, ``changes``, ``blob_refs``, ``page_ids``, ``record``) as
 owned by the event afterward and must not mutate it between the call and
-``app.save()`` — doing so would rewrite recorded history and can make a reloaded
+``app.save()`` -- doing so would rewrite recorded history and can make a reloaded
 aggregate diverge from the in-memory one. This is standard event-sourcing
 discipline: events own their data. The aggregate's *own* state is already
 isolated (``__init__`` deep-copies ``record``; ``PageChangeEntry`` copies
-``changes`` on construction), so normal "build args → fire → save" usage is safe.
+``changes`` on construction), so normal "build args -> fire -> save" usage is safe.
+
+Extension mutation discipline
+------------------------------
+``PageRecord.extensions`` must **not** be mutated directly on an already-persisted
+aggregate (i.e. after the first ``app.save()``). Direct mutation is not captured
+as an event and is silently lost on the next reload / replay. Use
+``PageAggregate.set_extension(namespace, value)`` instead -- it records an
+``ExtensionSet`` event so the mutation survives replay and snapshotting.
+
+The free ``set_extension(record, namespace, value)`` helper in
+``pdomain_ops.pages.extensions`` remains the correct tool for pre-save record
+construction (before the aggregate is first persisted).
 
 ``ocr_completed`` and ``preprocess`` backfill behaviour
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -29,18 +41,22 @@ node's ``blob_refs`` from the kwarg via ``_with_blob_refs`` (non-mutating
 either location works: a node that already carries ``blob_refs`` wins (existing
 callers are unaffected), while a node with empty ``blob_refs`` inherits them
 from the kwarg. Because the event stores both ``provenance_node`` *and*
-``blob_refs`` as separate fields, the merge recomputes identically on replay —
+``blob_refs`` as separate fields, the merge recomputes identically on replay --
 replay determinism is preserved.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from eventsourcing.application import Application
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 from pdomain_ops.pages import PageChangeEntry, PageRecord, ProjectRecord, ProvenanceNode
 from pdomain_ops.pages.provenance import ProvenanceGraph
@@ -112,6 +128,31 @@ class PageAggregate(Aggregate):
     def exported(self, provenance_node: ProvenanceNode) -> None:
         """Record that this page was exported."""
         self._apply_node(provenance_node)
+
+    def set_extension(self, namespace: str, value: BaseModel) -> None:
+        """Set or replace an extension namespace on this page, recording an event.
+
+        Dumps ``value`` to a JSON-able dict (via ``model_dump(mode="json")``) and
+        fires an ``ExtensionSet`` event so the mutation is captured in the event
+        store and survives replay and snapshotting.
+
+        Use this method for **post-persist** extension updates (i.e. after the
+        aggregate has already been saved). For pre-save record construction use
+        the free ``set_extension(record, namespace, value)`` helper in
+        ``pdomain_ops.pages.extensions``.
+        """
+        self._record_extension(namespace=namespace, data=value.model_dump(mode="json"))
+
+    @event("ExtensionSet")
+    def _record_extension(self, namespace: str, data: dict[str, Any]) -> None:
+        """Apply an ExtensionSet event: store data under namespace (deep-copied).
+
+        Deep-copy guards the by-reference footgun: ``@event`` stores args by
+        reference, so without the copy a subsequent mutation of ``data`` by the
+        caller would corrupt the stored event. On replay the event carries the
+        already-serialized dict copy, so replay is deterministic.
+        """
+        self._record.extensions[namespace] = deepcopy(data)
 
 
 class ProjectAggregate(Aggregate):
