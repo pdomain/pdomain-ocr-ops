@@ -44,6 +44,13 @@ class PageRecord(BaseModel):
 
     ``page_id`` equals ``Page.page_id`` and ``PageAggregate.id`` — the stable
     identity of the physical page entity, not a content version.
+
+    ``extensions`` is a namespaced dict for app-specific JSON-able state.
+    Each app claims a unique key (e.g. ``"labeler"``, ``"prep"``) and stores
+    a plain JSON-serialisable dict. Use ``get_extension``/``set_extension``
+    from ``pdomain_ops.pages.extensions`` for typed access. The field
+    serialises through ``_PageRecordTranscoding`` for free — no new
+    transcoding is required (design: page-server v2 §1).
     """
 
     page_id: UUID
@@ -56,6 +63,7 @@ class PageRecord(BaseModel):
     provenance: ProvenanceGraph | None = None
     provenance_summary: str | None = None
     changelog: list[PageChangeEntry] = Field(default_factory=list)
+    extensions: dict[str, dict[str, Any]] = Field(default_factory=dict)
 
 
 class ProjectRecord(BaseModel):

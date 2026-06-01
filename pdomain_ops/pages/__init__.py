@@ -5,6 +5,7 @@ Pure pydantic. No eventsourcing, no blob/file I/O. The event store
 are separate, lifecycle-consumer-only modules.
 """
 
+from pdomain_ops.pages.extensions import get_extension, set_extension
 from pdomain_ops.pages.payload import PagePayload
 from pdomain_ops.pages.provenance import DeadBranch, ProvenanceGraph, ProvenanceNode
 from pdomain_ops.pages.records import (
@@ -25,4 +26,6 @@ __all__ = [
     "ProvenanceNode",
     "RotationSource",
     "build_provenance_summary",
+    "get_extension",
+    "set_extension",
 ]

@@ -14,6 +14,8 @@ from pdomain_ops.pages import (
     ProvenanceNode,
     RotationSource,
     build_provenance_summary,
+    get_extension,
+    set_extension,
 )
 from pdomain_ops.suite.routes import mount_routes
 from pdomain_ops.suite.types import SuiteAdapters
@@ -30,5 +32,7 @@ __all__ = [
     "SuiteAdapters",
     "__version__",
     "build_provenance_summary",
+    "get_extension",
     "mount_routes",
+    "set_extension",
 ]
